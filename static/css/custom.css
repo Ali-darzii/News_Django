@@ -1,0 +1,10 @@
+.captcha-image{
+    max-width: 100px;
+    margin-top: 8px;
+    margin-bottom:8px ;
+}
+.sel-form{
+    width: 25%;
+    direction: ltr;
+    text-align: left;
+}

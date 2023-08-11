@@ -1,0 +1,29 @@
+{% load render_partial %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" >
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<!-- Meta Tags -->
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="author" content="Blogzine">
+	<meta name="description" content="قالب وبلاگ و مجله خبری مبتنی بر بوت استرپ">
+
+    {% include 'shared/header_refrences.html' %}
+
+    {% block header_refrences %}{% endblock %}
+</head>
+
+
+{% render_partial 'home.views.site_header_components' %}
+
+{% block content %}{% endblock %}
+
+{% render_partial 'home.views.site_footer_components' %}
+
+{% include 'shared/footer_refrences.html' %}
+
+{% block footer_refrences %}{% endblock %}
+
+</body>
+</html>

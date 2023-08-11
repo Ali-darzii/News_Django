@@ -1,0 +1,85 @@
+{% extends 'shared/_layout.html' %}
+
+{% block title %}
+    ورود
+{% endblock %}
+
+
+{% block header_refrences %}
+    <link rel="stylesheet" href="/static/css/custom.css">{% endblock %}
+
+{% block content %}
+
+    <main>
+
+        <section>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-10 col-lg-8 col-xl-6 mx-auto">
+                        <div class="p-4 p-sm-5 bg-primary bg-opacity-10 rounded">
+                            <h2>ورود به حساب کاربری</h2>
+                            <!-- Form START -->
+                            <form class="mt-4" action="{% url 'sign_in' %}" method="post">
+                                {% csrf_token %}
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label class="form-label" for="emailsignup">{{ form.email.label }}</label>
+                                    {{ form.email }}
+
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label" for="passworddignup">{{ form.password.label }}</label>
+                                    {{ form.password }}
+                                    <div class="text-danger-emphasis">{{ form.email.errors }}</div>
+                                </div>
+                                <!-- Checkbox -->
+
+                                {% if captcha_active %}
+                                    <div class="mb-3">
+                                        <label class="form-label">{{ form.captcha.label }}</label>
+                                        {{ form.captcha }}
+                                        <div class="text-danger-emphasis">{{ form.captcha.errors }}</div>
+                                    </div>
+                                {% endif %}
+
+                                <div class="mb-3 form-check">
+                                    {{ form.remember_me }}
+                                    <label class="form-check-label"
+                                           for="exampleCheck1">{{ form.remember_me.label }}</label>
+                                </div>
+
+                                <!-- Button -->
+                                <div class="row align-items-center">
+                                    <div class="col-sm-4">
+                                        <button type="submit" class="btn btn-success">ورود</button>
+                                    </div>
+                                    <div class="col-sm-8 text-sm-end">
+                                        <span>آیا هنوز ثبت نام نکرده اید؟ <a
+                                                href="{% url 'sign_up' %}"><u>ثبت نام</u></a></span>
+                                    </div>
+                                </div>
+                            </form>
+                            <!-- Form END -->
+                            <hr>
+                            <!-- Social-media btn -->
+                            <div class="text-light-emphasis">
+
+                                <a href="{% url 'forget_password_page' %}"> فراموشی رمز عبور</a>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+{% endblock %}
+
+{% block footer_refrences %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    {% load sweetify %}
+    {% sweetify %}
+{% endblock %}
+
