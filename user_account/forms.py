@@ -2,8 +2,6 @@ from django import forms
 from django.core import validators
 from django.core.exceptions import ValidationError
 from captcha.fields import CaptchaField
-from captcha import fields
-from django.http import HttpRequest
 
 
 class SignupForm(forms.Form):
@@ -41,7 +39,7 @@ class SignupForm(forms.Form):
                 'placeholder': '*********',
             }))
         # captcha required status
-        captcha_counter = captcha_pop.get('captcha_active_signup')
+        captcha_counter = captcha_pop.get('captcha_counter_signup')
         captcha_status: bool = False
         if captcha_counter >= 2:
             captcha_status: bool = True
@@ -127,3 +125,38 @@ class ForgetPasswordForm(forms.Form):
         if captcha_counter >= 2:
             captcha_status: bool = True
         self.fields['captcha'] = CaptchaField(label='(لطفا متن داخل تصویر را وارد کنید)', required=captcha_status)
+
+
+class ResetPasswordForm(forms.Form):
+    password = forms.CharField(
+        label='رمز عبور',
+        required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'id': 'passworddignup',
+            'placeholder': '*********',
+
+        }),
+    )
+
+    confirm_password = forms.CharField(
+        label='تایید رمز عبور',
+        # required=True,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'id': 'confirmpassworddignup',
+            'placeholder': '*********',
+        }))
+
+    def clean(self):
+        clean = super().clean()
+        password = clean.get('password')
+        confirm_password = clean.get('confirm_password')
+        # Pair Password
+        if password != confirm_password:
+            self.add_error('password', 'رمز شما مطابقت ندارد')
+        # password > 6
+        elif not 6 < len(password) < 30:
+            self.add_error('password', 'رمز شما باید بین 6 تا 30 حرف باشد')
+
+        return clean

@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.utils.crypto import get_random_string
 
 from django.views.generic.base import TemplateView, View
-from .forms import SignupForm, SignInFrom, ForgetPasswordForm
+from .forms import SignupForm, SignInFrom, ForgetPasswordForm, ResetPasswordForm
 from django.urls import reverse
 from django.contrib.auth import login, logout
 from utils.email_service import send_email
@@ -22,9 +22,7 @@ class SignUpView(View):
         captcha_counter = request.session.get('captcha_counter_signup')
         if captcha_counter is None:
             captcha_counter = request.session['captcha_counter_signup'] = 0
-        kwarg_signup = {
-            'captcha_active_signup': captcha_counter
-        }
+        kwarg_signup = {'captcha_counter_signup': captcha_counter}
         signup_form = SignupForm(kwarg_signup=kwarg_signup)
         # In/visible captcha
         captcha_status = False
@@ -40,18 +38,18 @@ class SignUpView(View):
     def post(self, request: HttpRequest, **kwargs):
         # captcha: get_session and send data to form
         captcha_counter = request.session.get('captcha_counter_signup')
-        kwarg_signup = {'captcha_active_signup': captcha_counter}
+        kwarg_signup = {'captcha_counter_signup': captcha_counter}
         signup_form = SignupForm(request.POST, kwarg_signup=kwarg_signup)
         # In/visible captcha
         captcha_status = False
         if captcha_counter >= 2:
             captcha_status = True
-
+        request.session['captcha_counter_signup'] += 1
         if request.user.is_authenticated:
             logout(request)
         if request.method == 'POST':
             if signup_form.is_valid():
-                request.session['captcha_counter_signin'] += 1
+
                 password = signup_form.cleaned_data['password']
                 email = signup_form.cleaned_data['email']
                 user_exist: bool = User.objects.filter(email__iexact=email).exists()
@@ -63,7 +61,7 @@ class SignUpView(View):
                                     username=email)
                     new_user.set_password(password)
                     new_user.save()
-                    del request.session['captcha_counter_signin']
+                    del request.session['captcha_counter_signup']
                     send_email('فعال سازی حساب کاربری ', new_user.email, {'user': new_user},
                                'emails/activate_account.html')
                     sweetify.sweetalert(request, 'عملیات موفق', icon='success',
@@ -71,8 +69,7 @@ class SignUpView(View):
                                         button='<a style="color:white;" href="http://127.0.0.1:8000/sign-in">رفتن به صفحه ورود</a>',
                                         persistent=True
                                         )
-            else:
-                request.session['captcha_counter_signup'] += 1
+
         context = {
             'form': signup_form,
             'captcha_active': captcha_status
@@ -114,6 +111,22 @@ class SignInView(View):
                                 persistent=True
                                 )
             del request.session['new_active']
+
+        user_found = request.session.get('user_found_reset')
+        if user_found is not None:
+            sweetify.sweetalert(request, 'عملیات موفق', icon='success',
+                                text='رمز حساب کاربری شما تغییر یافت و می توانید ورود کنید',
+                                button='ok',
+                                persistent=True
+                                )
+
+        panel_change_pass = request.session.get('panel_change_pass')
+        if panel_change_pass is not None:
+            sweetify.sweetalert(request, 'عملیات موفق', icon='success',
+                                text='رمز حساب کاربری شما تغییر یافت و می توانید ورود کنید',
+                                button='ok',
+                                persistent=True
+                                )
 
         # In/visible captcha
         captcha_status = False
@@ -206,9 +219,9 @@ class ForgetPasswordView(View):
                 if user is not None:
                     send_email('فراموشی رمز عبور', user.email, {'user': user}, 'emails/forgotten_password.html')
                     del request.session['forg_counter']
-                    sweetify.sweetalert(request, 'عملیات موفق', icon='info',
-                                        text='حساب کاربری شما فعال شد و می توانید ورود کنید',
-                                        button='ok',
+                    sweetify.sweetalert(request, 'عملیات موفق', icon='success',
+                                        text='ایمیلی حاوی لینک برای تغییر رمز خود فرستاده شد.',
+                                        button='OK',
                                         persistent=True
                                         )
                 else:
@@ -221,11 +234,42 @@ class ForgetPasswordView(View):
 
 
 class ResetPasswordView(View):
-    def get(self, request: HttpRequest):
-        pass
+    def get(self, request: HttpRequest, active_code):
+        user: User = User.objects.filter(email_active_code__iexact=active_code).first()
+        if user is None:
+            return redirect(reverse('sign_up'))
+        reset_form = ResetPasswordForm()
+        context = {
+            'user': user,
+            'form': reset_form
+        }
+        return render(request, 'user_account/reset_password_page.html', context)
 
-    def post(self, request: HttpRequest):
-        pass
+    def post(self, request: HttpRequest, active_code):
+        reset_form = ResetPasswordForm(request.POST)
+        user: User = User.objects.filter(email_active_code__iexact=active_code).first()
+        if request.method == 'POST' and reset_form.is_valid():
+            if user is not None:
+                password = reset_form.cleaned_data['password']
+                same_password = user.check_password(password)
+                if not same_password:
+                    user.set_password(password)
+                    user.email_active_code = get_random_string(72)
+                    user.is_active = True
+                    user.save()
+                    request.session['user_found_reset'] = 'True'
+                    return redirect(reverse('sign_in'))
+                else:
+                    reset_form.add_error('password', 'رمز وارد شده رمز قبلی است, لطفا رمز جدیدی وارد کنید')
+
+            else:
+                request.session['user_not_found_reset'] = 'True'
+                return redirect(reverse('contact_us_page'))
+        context = {
+            'form': reset_form,
+            'user': user
+        }
+        return render(request, 'user_account/reset_password_page.html', context)
 
 
 class SignOut(View):

@@ -518,7 +518,7 @@ button:not(:disabled),
 }
 
 textarea {
-  resize: vertical;
+  resize: none;
 }
 
 fieldset {
@@ -8737,7 +8737,7 @@ textarea.form-control-lg {
 
 .my-1 {
   margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
 .my-2 {

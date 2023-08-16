@@ -1,4 +1,4 @@
-Profile dropdown START
+
 <div class="preloader animate__animated animate__fadeOut" style="display: none;">
     <div class="loader">
         <div class="sh1"></div>
@@ -136,8 +136,13 @@ Profile dropdown START
                                 <a class="avatar avatar-sm p-0 show" href="#" id="profileDropdown" role="button"
                                    data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown"
                                    aria-expanded="true">
-                                    <img class="avatar-img rounded-circle" src="/static/images/avatar/03.jpg"
+                                    {% if user.avatar %}
+                                    <img class="avatar-img rounded-circle" src="{{ user.avatar.url }}"
                                          alt="avatar">
+                                    {% else %}
+                                        <img class="avatar-img rounded-circle" src="/static/images/avatar/Defult_Profile.jpg"
+                                         alt="avatar">
+                                    {% endif %}
                                 </a>
 
                                 <!-- Profile dropdown START -->
@@ -147,13 +152,20 @@ Profile dropdown START
                                     <li class="px-3">
                                         <div class="d-flex align-items-center">
                                             <!-- Avatar -->
+                                            {% if user.avatar %}
                                             <div class="avatar me-3">
                                                 <img class="avatar-img rounded-circle shadow"
-                                                     src="/static/images/avatar/03.jpg" alt="avatar">
+                                                     src="{{ user.avatar.url }}" alt="avatar">
                                             </div>
+                                            {% else %}
+                                                <div class="avatar me-3">
+                                                <img class="avatar-img rounded-circle shadow"
+                                                     src="/static/images/avatar/Defult_Profile.jpg" alt="avatar">
+                                            </div>
+                                            {% endif %}
                                             <div>
-                                                <a class="h6 mt-2 mt-sm-0" href="#"> علیرضا مرادی</a>
-                                                <p class="small m-0">example@gmail.com</p>
+                                                <a class="h6 mt-2 mt-sm-0" href="#">{{ user.first_name }}{{ user.last_name }}</a>
+                                                <p class="small m-0">{{ user.email }}</p>
                                             </div>
                                         </div>
                                         <hr>
@@ -247,7 +259,7 @@ Profile dropdown START
                 <!-- Dark mode options END -->
                 <!-- Nav Button -->
                 <div class="nav-item d-none d-md-block">
-                    <a href="#" class="btn btn-sm btn-danger mb-0 mx-2">تماس با ما</a>
+                    <a href="{% url 'contact_us_page' %}" class="btn btn-sm btn-danger mb-0 mx-2">تماس با ما</a>
                 </div>
                 <!-- Nav Search -->
                 <div class="nav-item position-relative ms-3">

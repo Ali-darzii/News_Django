@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'user_account',
     'home',
     'user_panel',
+    'contact_us',
+    'polls',
     # external
     'django_render_partial',
     'jalali_date',
@@ -146,7 +148,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'ali.darrzi.1382@gmail.com'
 EMAIL_HOST_PASSWORD = 'pmmmvkfijdjbgrni'
 EMAIL_PORT = 587
-
+# LANGUAGE_CODE = 'fa'
 JALALI_DATE_DEFAULTS = {
     'Strftime': {
         'date': '%y/%m/%d',  # date2jalali using this line

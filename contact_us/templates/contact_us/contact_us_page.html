@@ -1,0 +1,115 @@
+{% extends 'shared/_layout.html' %}
+
+{% block title %}
+    بلاگینز | تماس با ما
+{% endblock %}
+{% block header_refrences %}
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="/static/css/custom.css">
+{% endblock %}
+{% block content %}
+    <main>
+        <div class="pt-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-9 mx-auto">
+                        <div class="row">
+                            <div class="col-12">
+                                <h2>تماس با ما</h2>
+                                <p>لطفا فرم زیر را پر کنید و به زودی به ایمیل شما پیام می دهیم. آدرس ایمیل شما منتشر
+                                    نخواهد شد.</p>
+                                <!-- Form START -->
+                                <form class="contact-form" id="contact-form" name="contactform" method="POST"
+                                      action="{% url 'contact_us_page' %}">
+                                    {% csrf_token %}
+                                    <!-- Main form -->
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <!-- name -->
+                                            <div class="mb-3">
+                                                {{ form.full_name }}
+                                                <div class="text-danger-emphasis">{{ form.full_name.errors }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <!-- email -->
+                                            <div class="mb-3">
+                                                {{ form.email }}
+                                                <div class="text-danger-emphasis">{{ form.email.errors }}</div>
+                                                {{ form.non_field_errors }}
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <!-- Subject -->
+                                            <div class="mb-3">
+                                                {{ form.title }}
+                                                <div class="text-danger-emphasis">{{ form.title.errors }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <!-- Message -->
+                                            <div class="mb-3">
+                                                {{ form.text_massege }}
+                                                <div class="text-danger-emphasis">{{ form.text_massege.errors }}</div>
+                                            </div>
+                                        </div>
+                                        <!-- submit button -->
+                                        <div class="col-md-12 text-start">
+                                            <button class="btn btn-primary w-100" type="submit">ارسال پیام</button>
+                                        </div>
+                                    </div>
+                                </form>
+                                <!-- Form END -->
+                            </div>
+                        </div>
+
+                        <hr class="my-5">
+                        <iframe class="w-100 h-300 grayscale"
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6484.772742287604!2d51.40598644446161!3d35.64285122120061!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3f91fe3a29bad849%3A0xb4eacf9cb6647fc6!2z2YbYp9iy24wg2KLYqNin2K_YjCDYqtmH2LHYp9mG2Iwg2KfYs9iq2KfZhiDYqtmH2LHYp9mG2Iwg2KfbjNix2KfZhg!5e0!3m2!1sfa!2s!4v1673162969520!5m2!1sfa!2s"
+                                height="500" style="border:0;" aria-hidden="false" allowfullscreen="" loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        <div class="row mt-5">
+                            <div class="col-sm-6 mb-5 mb-sm-0">
+                                <h3>تبلیغات / حمایت مالی</h3>
+                                <p>جهت دریافت مشاوره برای تبلیغات با ما تماس بگیرید.</p>
+                                <address>تهران، میدان هفت تیر، مجمتع صدف پلاک 82</address>
+                                <p>شماره تماس: <a href="#" class="text-reset"><u>469-537-2410</u></a></p>
+                                <p>خبر الکترونیکی: <a href="#" class="text-reset"><u>advertise@example.com</u></a></p>
+                                <p>ساعات کار: شنبه تا چهارشنبه
+                                    <br>
+                                    9:30 صبح تا 18:30 بعد از ظهر
+                                </p>
+                            </div>
+                            <div class="col-sm-6">
+                                <h3>اطلاعات تماس </h3>
+                                <p>جهت دربافت مشاوره رایگان قبل از خرید با ما تماس بگیرید.</p>
+                                <address>تهران، میدان هفت تیر، مجمتع صدف پلاک 82</address>
+                                <p>شماره تماس: <a href="#" class="text-reset"><u>469-537-2410</u></a></p>
+                                <p>خبر الکترونیکی: <a href="#" class="text-reset"><u>contact@example.com</u></a></p>
+                                <p>ساعات کار: شنبه تا چهارشنبه
+                                    <br>
+                                    9:30 صبح تا 18:30 بعد از ظهر
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </main>
+{% endblock %}
+
+{% block footer_refrences %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    {% load sweetify %}
+    {% sweetify %}
+{% endblock %}
+
+
+
+
+
+<!-- =======================
+Contact info END -->
