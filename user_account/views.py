@@ -10,7 +10,7 @@ from django.contrib.auth import login, logout
 from utils.email_service import send_email
 from utils.validators import password_compair
 import sweetify
-from .models import User
+from .models import User, Profile
 from django.contrib.auth.password_validation import validate_password
 import json
 
@@ -87,6 +87,8 @@ class ActivateAccountView(View):
                 # bane or
                 # delete his account
                 user.save()
+                user_profile: Profile = Profile(user_id=user.id)
+                user_profile.save()
                 request.session['new_active'] = 'True'
                 return redirect(reverse('sign_in'))
             else:
@@ -119,6 +121,7 @@ class SignInView(View):
                                 button='ok',
                                 persistent=True
                                 )
+            del request.session['user_found_reset']
 
         panel_change_pass = request.session.get('panel_change_pass')
         if panel_change_pass is not None:
@@ -127,6 +130,8 @@ class SignInView(View):
                                 button='ok',
                                 persistent=True
                                 )
+            del request.session['panel_change_pass']
+
 
         # In/visible captcha
         captcha_status = False
