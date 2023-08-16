@@ -24,7 +24,7 @@ $(document).ready(function () {
         var file = $(this)[0].files[0];
         if (file) {
             $("#imagePreview").html(`<img src="${URL.createObjectURL(file)}" alt="Uploaded Image">`);
-            $("#imageName").text(`Image Name: ${file.name}`);
+            $("#imageName").text(`عکس انتخاب شده: ${file.name}`);
             $("#deleteButton").show();
 
             var formData = new FormData();

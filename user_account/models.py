@@ -33,6 +33,7 @@ class Profile(models.Model):
     phone = models.CharField(max_length=11, blank=True, null=True, verbose_name='تلفن همراه')
     home_phone = models.CharField(max_length=11, blank=True, null=True, verbose_name='تلفن خانه')
     address = models.TextField(max_length=200, blank=True, null=True, verbose_name='ادرس')
+    post_cart = models.CharField(max_length=10, blank=True, null=True, verbose_name='تلفن خانه')
 
     def __str__(self):
         return self.user.username

@@ -153,11 +153,11 @@ class SignInView(View):
             if not request.user.is_authenticated:
                 request.session['captcha_counter'] += 1
                 if signin_form.is_valid():
-                    email = signin_form.cleaned_data.get('email')
+                    email = signin_form.cleaned_data['email']
                     user: User = User.objects.filter(email__iexact=email).first()
                     if user is not None:
                         if user.is_active:
-                            password = signin_form.cleaned_data.get('password')
+                            password = signin_form.cleaned_data['password']
                             password_check = user.check_password(password)
                             if password_check:
                                 del request.session['captcha_counter']

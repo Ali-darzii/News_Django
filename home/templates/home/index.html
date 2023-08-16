@@ -3,6 +3,9 @@
 {% block title %}
     خانه  | بلاگ نیز
 {% endblock %}
+{% block header_refrences %}
+    <link rel="stylesheet" href="/static/css/custom.css">
+{% endblock %}
 
 {% block content %}
     <main>
@@ -618,4 +621,9 @@
 
     </main>
 
+{% endblock %}
+{% block footer_refrences %}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+    {% load sweetify %}
+    {% sweetify %}
 {% endblock %}

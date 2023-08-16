@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.core import validators
 from django.core.exceptions import ValidationError
@@ -52,11 +54,13 @@ class SignupForm(forms.Form):
         password = clean.get('password')
         confirm_password = clean.get('confirm_password')
         # Pair Password
-        if password != confirm_password:
+        if not re.findall('[a-z]', password) or not re.findall('[a-z]', password):
+            self.add_error('password', 'لطفا از زبان انگیلیسی استفاده کنید')
+        elif password != confirm_password:
             self.add_error('password', 'رمز شما مطابقت ندارد')
         # password > 6
         elif not 6 < len(password) < 30:
-            self.add_error('password', 'رمز شما باید بین 6 تا 30 حرف باشد')
+            self.add_error('password', 'رمز شما باید بین 7 تا 30 عدد یا حرف باشد    ')
 
         return clean
 
@@ -100,6 +104,14 @@ class SignInFrom(forms.Form):
                                                             'class': 'form-check-input',
                                                             'id': 'remember-me',
                                                         }))
+
+    def clean(self):
+        clean = super().clean()
+        password = clean.get('password')
+
+        if not re.findall('[a-z]', password) or not re.findall('[a-z]', password):
+            self.add_error('password', 'لطفا از زبان انگیلیسی استفاده کنید')
+        return clean
 
 
 class ForgetPasswordForm(forms.Form):
@@ -153,10 +165,13 @@ class ResetPasswordForm(forms.Form):
         password = clean.get('password')
         confirm_password = clean.get('confirm_password')
         # Pair Password
-        if password != confirm_password:
+        if not re.findall('[a-z]', password) or not re.findall('[a-z]', password):
+            self.add_error('password', 'لطفا از زبان انگیلیسی استفاده کنید')
+
+        elif password != confirm_password:
             self.add_error('password', 'رمز شما مطابقت ندارد')
         # password > 6
         elif not 6 < len(password) < 30:
-            self.add_error('password', 'رمز شما باید بین 6 تا 30 حرف باشد')
+            self.add_error('password', 'رمز شما باید بین 7 تا 30 عدد یا حرف باشد')
 
         return clean
