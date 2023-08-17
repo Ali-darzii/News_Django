@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'user_panel',
     'contact_us',
     'polls',
+    'product',
     # external
     'django_render_partial',
     'jalali_date',

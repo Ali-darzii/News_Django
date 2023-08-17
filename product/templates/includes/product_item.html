@@ -1,0 +1,45 @@
+{% load thumbnail %}
+{% load poll_extras %}
+
+<div class="col-sm-6 col-md-4">
+						<div class="card border p-3 h-100">
+							<div class="position-relative">
+								<!-- Image -->
+								<a href="shop-detail.html" class="position-relative z-index-9">
+{#                                {% if product.image %}#}
+                                    <img src="/static/images/shop/03.png" alt="">
+{#                                    {% else %}#}
+{#                                    <img src="/static/images/adv.png" alt="">#}
+{#                                {% endif %}#}
+{#                                    <img class="card-img" src="/static/images/shop/03.png" alt="">#}
+                                </a>
+								<!-- Overlay -->{% comment %}
+								<div class="card-img-overlay p-0">
+									<div> <span class="badge text-bg-success">جدید</span></div>
+								</div>
+							</div>{% endcomment %}
+
+							<!-- Card body -->
+							<div class="card-body text-center p-3 px-0">
+								<!-- Badge and price -->
+								<div class="d-flex justify-content-center mb-2">
+									<ul class="list-inline mb-0">
+										<li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
+										<li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
+										<li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
+										<li class="list-inline-item me-0 small"><i class="fas fa-star text-warning"></i></li>
+										<li class="list-inline-item me-0 small"><i class="fas fa-star-half-alt text-warning"></i></li>
+									</ul>
+								</div>
+								<!-- Title -->
+								<h5 class="card-title"><a href="shop-detail.html">{{ product.title }}</a></h5>
+								<h6 class="mb-0 text-success">{{ product.price|three_digits_currency }}</h6>
+							</div>
+
+							<!-- Card footer -->
+							<div class="card-footer text-center p-0">
+								<!-- Button -->
+								<a href="#" class="btn btn-sm btn-primary-soft mb-0"><i class="bi bi-cart me-2"></i>افزودن به سبد</a>
+							</div>
+						</div>
+					</div>
