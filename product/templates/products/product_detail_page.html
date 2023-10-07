@@ -1,0 +1,1439 @@
+{% extends 'shared/_layout.html' %}
+{% load poll_extras %}
+{% block title %}
+    جزییات محصول | بلاگینز
+{% endblock %}
+
+{% block header_refrences %}
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/glightbox/css/glightbox.css">
+
+    <!-- Dark mode -->
+    <script>
+        const storedTheme = localStorage.getItem('theme')
+
+        const getPreferredTheme = () => {
+            if (storedTheme) {
+                return storedTheme
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const setTheme = function (theme) {
+            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+        }
+
+        setTheme(getPreferredTheme())
+
+        window.addEventListener('DOMContentLoaded', () => {
+            var el = document.querySelector('.theme-icon-active');
+            if (el != 'undefined' && el != null) {
+                const showActiveTheme = theme => {
+                    const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                    const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+
+                    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                        element.classList.remove('active')
+                    })
+
+                    btnToActive.classList.add('active')
+                    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                }
+
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (storedTheme !== 'light' || storedTheme !== 'dark') {
+                        setTheme(getPreferredTheme())
+                    }
+                })
+
+                showActiveTheme(getPreferredTheme())
+
+                document.querySelectorAll('[data-bs-theme-value]')
+                    .forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const theme = toggle.getAttribute('data-bs-theme-value')
+                            localStorage.setItem('theme', theme)
+                            setTheme(theme)
+                            showActiveTheme(theme)
+                        })
+                    })
+
+            }
+        })
+
+    </script>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/tiny-slider/tiny-slider.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/glightbox/css/glightbox.css">
+
+    <!-- Theme CSS -->
+    <link id="style-switch" rel="stylesheet" type="text/css" href="/static/css/style-rtl.css">
+    <style></style>
+{% endblock %}
+
+{% block content %}
+    <main>
+
+        <!-- =======================
+        Main START -->
+        <section>
+            <div class="container">
+                <div class="row g-4 g-lg-0 justify-content-between">
+                    <!-- Image -->
+                    <div class="col-lg-5">
+                        <div class="row g-2">
+                            <div class="col-12">
+                                <div class="bg-light rounded-2 glightbox-bg p-4 position-relative">
+                                    {% comment %}<a id="Big_href" href="{{ product.image.url }}" class="stretched-link cursor-zoom"
+                                       data-glightbox="" data-gallery="image-popup">{% endcomment %}
+                                        <img id="Big_image" src="{{ product.image.url }}" alt="">
+                                    {% comment %}</a>{% endcomment %}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Detail -->
+                    <div class="col-lg-6">
+                        <!-- Title -->
+                        <h1>{{ product.title }}</h1>
+                        <p class="mb-4">{{ product.short_descriptions }}</p>
+                        <!-- Rating -->
+                        <ul class="list-inline mb-0">
+                            {% if half_star %}
+                                <li class="list-inline-item me-1">
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            {% endif %}
+                            {% for i in comments_int %}
+                                <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                            {% endfor %}
+
+                            <li class="list-inline-item me-0 h6">5 / {{ comments_avg }}</li>
+                        </ul>
+
+                        <!-- List START -->
+                        <div class="bg-light p-3 rounded-2 mb-4">
+                            <div class="row g-2">
+                                <!-- List -->
+                                <div class="col-sm-6">
+                                    <ul class="list-group list-group-borderless">
+                                        <li class="list-group-item py-0">
+                                            {% if product.inventory %}
+                                                <span>وضعیت: موجود</span>
+                                            {% else %}
+                                                <span>وضعیت:</span><span class="text-danger-emphasis">ناموجود</span>
+                                            {% endif %}
+
+                                        </li>
+                                        <li class="list-group-item pb-0">
+                                            <span>برند:</span>
+                                            <span class="h6 mb-0">{{ product.brand }}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <!-- List -->
+                                <div class="col-sm-6">
+                                    <ul class="list-group list-group-borderless">
+                                        <li class="list-group-item py-0">
+                                            <span>موجود در انبار:</span>
+                                            <span class="h6 mb-0">{{ product.inventory_number }}</span>
+                                        </li>
+                                        <li class="list-group-item pb-0">
+                                            {% if product.weight %}
+                                                <span>وزن:</span>
+                                                <span class="h6 mb-0">{{ product.weight }}</span>
+                                            {% endif %}
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- List END -->
+
+                        <!-- Variant START -->
+                        <div class="mb-4">
+                            <span>گالری تصاویر:</span>
+                            <ul class="list-inline mt-2">
+                                <li class="list-inline-item">
+                                    <input autocomplete="off" checked type="radio" class="btn-check" name="one_name" id="Gallery{{ product.id}}">
+                                    <label for="Gallery{{ product.id}}" onclick="selectedImage('{{ product.image.url }}')"
+                                           class="btn btn-primary-soft-check" id="origin_product">
+                                        <img src="{{ product.image.url }}" class="w-60" alt="">
+                                    </label>
+                                </li>
+                                <!-- Price -->
+                                {% for gallery_product in product_gallery_group %}
+                                    <li class="list-inline-item">
+                                        <input autocomplete="off" type="radio" class="btn-check" name="one_name"
+                                               id="Galleries{{ gallery_product.id }}">
+                                        <label for="Galleries{{ gallery_product.id }}" onclick="selectedImage('{{ gallery_product.image.url }}')"
+                                               class="btn btn-primary-soft-check">
+                                            <img src="{{ gallery_product.image.url }}" class="w-60" alt="">
+                                        </label>
+                                    </li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                        <!-- Variant END -->
+
+                        <!-- Price and button START -->
+                        <div class="row">
+                            <!-- Price -->
+                            <div class="col-md-4">
+                                <h6 class="mb-0">قیمت:</h6>
+                                <h4 class="text-success">{{ product.price|three_digits_currency }}</h4>
+                            </div>
+                            <!-- Select -->
+                            <div class="col-md-2 pe-md-0 mb-2">
+                                <select id="product-count" class="form-select" aria-label="Default select example">
+                                    <option value="1">01</option>
+                                    <option value="2">02</option>
+                                    <option value="3">03</option>
+                                </select>
+                            </div>
+                            <!-- Button -->
+                            <div class="col-md-6">
+                                {% if user.is_authenticated %}
+                                    <a onclick="add_product_to_order('{{ product.id }}','true')" href="#"
+                                       class="btn btn-primary mb-0 w-100"><i class="bi bi-cart2 me-2"></i>افزودن به
+                                        سبد</a>
+                                    <p class="mb-0 mt-2 text-end small"><i
+                                            class="bi bi-question-circle-fill text-primary me-2"></i>پشتیبانی؟ <a
+                                            href="{% url 'contact_us_page' %}"
+                                            class="mb-0">ارسال
+                                        پیام</a></p>
+                                    </div>
+                                {% else %}
+                                    <a href="{% url 'sign_up' %}"
+                                       class="btn btn-primary mb-0 w-100"><i class="bi bi-cart2 me-2"></i>افزودن به
+                                        سبد</a>
+                                    <p class="mb-0 mt-2 text-end small"><i
+                                            class="bi bi-question-circle-fill text-primary me-2"></i>پشتیبانی؟ <a
+                                            href="{% url 'contact_us_page' %}"
+                                            class="mb-0">ارسال
+                                        پیام</a></p>
+                                    </div>
+                                {% endif %}
+
+                    </div>
+                    <!-- Price and button END -->
+                </div>
+            </div>
+            </div>
+        </section>
+        <!-- =======================
+        Main END -->
+
+        <!-- =======================
+        Description START -->
+        <section class="pt-0 pt-lg-5">
+            <div class="container">
+                <div class="row g-4 justify-content-between">
+                    <!-- Description -->
+                    <div class="col-lg-7">
+                        <h5>توضیحات</h5>
+                        <p>{{ product.descriptions }}</p>
+                    </div>
+
+                    <!-- List START -->
+                    <div class="col-lg-4">
+                        <h5>فروشنده</h5>
+                        <div class="d-flex align-items-center position-relative">
+                            <div class="avatar avatar-sm">
+                                <img class="avatar-img " src="/static/images/favicon.ico" alt="avatar">
+                            </div>
+                            <div class="ms-3">
+                                <h6 class="mb-0"><a href="{% url 'index_page' %}"
+                                                    class="stretched-link text-reset btn-link">بلاگینز</a></h6>
+                            </div>
+                        </div>
+                        <!-- List -->
+
+
+                        <!-- Shipment information -->
+                        <h5>اطلاعات حمل و نقل</h5>
+                        <ul class="list-group list-group-borderless">
+                            <li class="list-group-item py-0">
+                                <span>حمل و نقل:</span>
+                                <span class="h6 mb-0">حمل و نقل بین المللی طولانی مدت رایگان</span>
+                            </li>
+                            <li class="list-group-item pb-0">
+                                <span>تحویل:</span>
+                                <span class="h6 mb-0">ارسال از 1 روز کاری دیگر</span>
+                            </li>
+                            <li class="list-group-item pb-0">
+                                <span>پرداخت:</span>
+                                <img src="/static/images/icon/visa.svg" class="w-40 me-2" alt="">
+                                <img src="/static/images/icon/mastercard.svg" class="w-40" alt="">
+                            </li>
+                            <li class="list-group-item pb-0">
+                                <span>بازگشت:</span>
+                                <span class="h6 mb-0">ضمانت مرجوعی کالا تا یک هفته</span>
+                            </li>
+                        </ul>
+
+                    </div>
+                    <!-- List END -->
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        Description END -->
+
+        <!-- =======================
+        Rating and review START -->
+        <section id="rateAndreview" class="pt-0">
+            <div class="container">
+                <!-- Title -->
+                <div class="mb-2">
+                    <h2 class="mb-0">امتیاز و دیدگاه ها</h2>
+                </div>
+
+                <div class="row g-4 justify-content-between">
+                    <!-- Rating START -->
+                    <div class="col-md-4">
+                        <div class="bg-primary p-4 rounded-2 mb-4">
+                            <div class="text-center text-white">
+                                <!-- Info -->
+                                <h2 class="mb-0 text-white">5 / {{ comments_avg }}</h2>
+                                <p class="mb-2">{{ comments_count }} دیدگاه</p>
+                                <!-- Star -->
+                                <ul class="list-inline mb-0">
+                                    {% if half_star %}
+                                        <li class="list-inline-item me-1">
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    {% endif %}
+                                    {% for i in comments_int %}
+                                        <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    {% endfor %}
+
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12">
+                                <h6 class="mb-0">امتیاز کلی</h6>
+                            </div>
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <!-- Progress item -->
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_5 }}%"
+                                         aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_5 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <!-- Progress item -->
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_4 }}%"
+                                         aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_4 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+
+                            <div class="col-9 col-sm-10">
+                                <!-- Progress item -->
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_3 }}%"
+                                         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_3 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <!-- Progress item -->
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_2 }}%"
+                                         aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_2 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <!-- Progress item -->
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_1 }}%"
+                                         aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_1 }}%</span>
+                            </div>
+                        </div> <!-- Row END -->
+
+                    </div>
+                    <!-- Rating END -->
+
+                    <!-- Review START -->
+                    <div id="like-dislike-ajax" class="col-md-7">
+                        <!-- Title and Select -->
+
+
+                        <hr class="my-4"> <!-- Divider -->
+
+                        <!-- Review item -->
+                        {% for comment in comments %}
+                            <div class="d-flex">
+                                {% if comment.user.avatar %}
+                                    <img class="avatar avatar-md rounded-circle float-start me-3"
+                                         src="{{ comment.user.avatar.url }}" alt="avatar">
+                                {% else %}
+                                    <img class="avatar avatar-md rounded-circle float-start me-3"
+                                         src="/static/images/avatar/Defult_Profile.jpg" alt="avatar">
+                                {% endif %}
+
+                                <div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>
+                                            {% if comment.user %}
+                                                <h5 class="m-0">{{ comment.user }}</h5>
+                                            {% else %}
+                                                <h5 class="m-0">{{ comment.user.email }}</h5>
+                                            {% endif %}
+
+                                            <span class="me-3 small">{{ comment.create_date | show_jalali_date }} </span>
+                                        </div>
+                                        <!-- Rating Star -->
+                                        <ul class="list-inline star-place">
+                                            {% for i in comment.star|make_it_range %}
+
+                                                <li class="list-inline-item small me-0"><i
+                                                        class="fas fa-star text-warning"></i>
+                                                </li>
+                                            {% endfor %}
+
+                                        </ul>
+                                    </div>
+                                    <p>{{ comment.comment }}</p>
+
+
+                                    <div class=" ms-md-2" role="group"
+                                         aria-label="Basic radio toggle button group">
+                                        <span>ایا این دیدگاه مفید بود؟</span>
+                                        <!-- Yes button -->
+
+                                        {% if user in comment.likes.users.all %}
+                                            <input type="radio" class="btn-check" name="btnradio"
+                                                   id="btnradio{{ comment.id }}">
+                                            <span class="spandly">{{ comment.get_total_likes }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','like')"
+                                                   for="btnradio{{ comment.id }}">
+                                                <img
+                                                        class="self-thumbs-up"
+                                                        src="/static/images/liked_disliked/blue_liked_face_book.png"
+                                                        alt="">
+                                            </label>
+
+                                        {% else %}
+                                            <input type="radio" class="btn-check" name="btnradio"
+                                                   id="btnradio{{ comment.id }}">
+                                            <span class="spandly">{{ comment.get_total_likes }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','like')"
+                                                   for="btnradio{{ comment.id }}">
+                                                <img
+                                                        class="self-thumbs-up"
+                                                        src="/static/images/liked_disliked/Gray_face_book_like.png"
+                                                        alt="">
+                                            </label>
+
+
+                                        {% endif %}
+                                        {% if user in comment.dis_likes.users.all %}
+                                            <input type="radio" class="btn-check" name="btnradio"
+                                                   id="disbtnradio{{ comment.id }}">
+                                            <span class="spandly">{{ comment.get_total_dis_like }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','dislike')"
+                                                   for="disbtnradio{{ comment.id }}">
+                                                <img class="self-thumbs-down"
+                                                     src="/static/images/liked_disliked/red_dislike_face_book.png"
+                                                     alt="">
+                                            </label>
+                                        {% else %}
+                                            <input type="radio" class="btn-check" name="btnradio"
+                                                   id="disbtnradio{{ comment.id }}">
+                                            <span class="spandly">{{ comment.get_total_dis_like }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','dislike')"
+                                                   for="disbtnradio{{ comment.id }}">
+                                                <img class="self-thumbs-down"
+                                                     src="/static/images/liked_disliked/gray_dislike_face_book.png"
+                                                     alt="">
+                                            </label>
+
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4"> <!-- Divider -->
+                        {% endfor %}
+
+
+
+                        <!-- button -->
+                        {% if user.is_authenticated %}
+                            <div class="mt-4 text-end">
+                                <a class="btn btn-primary-soft mb-0" data-bs-toggle="collapse" href="#collapseExample"
+                                   role="button" aria-expanded="false" aria-controls="collapseExample">
+                                    ثبت دیدگاه
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="mt-4 text-end">
+                                <a class="btn btn-primary-soft mb-0" href="{% url 'sign_in' %}"
+                                   aria-expanded="false" aria-controls="collapseExample">
+                                    ثبت دیدگاه
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        <!-- Collapse body -->
+                        <div class="collapse" id="collapseExample">
+                            <div class="card card-body">
+
+                                {% comment %}<select class="form-select mb-3" aria-label="Default select example">
+                                    <option value="1">★★★★★ (5/5)</option>
+                                    <option value="2">★★★★☆ (4/5)</option>
+                                    <option value="3">★★★☆☆ (3/5)</option>
+                                    <option value="3">★★☆☆☆ (2/5)</option>
+                                    <option value="3">★☆☆☆☆ (1/5)</option>
+                                </select>{% endcomment %}
+                                <div class="rate">
+                                    <input onclick="starChanger('5')" type="radio" id="star5" name="rate" value="5"/>
+                                    <label onclick="starChanger('5')" for="star5" title="text">5 stars</label>
+                                    <input onclick="starChanger('4')" type="radio" id="star4" name="rate" value="4"/>
+                                    <label onclick="starChanger('4')" for="star4" title="text">4 stars</label>
+                                    <input onclick="starChanger('3')" type="radio" id="star3" name="rate" value="3"/>
+                                    <label onclick="starChanger('3')" for="star3" title="text">3 stars</label>
+                                    <input onclick="starChanger('2')" type="radio" id="star2" name="rate" value="2"/>
+                                    <label onclick="starChanger('2')" for="star2" title="text">2 stars</label>
+                                    <input onclick="starChanger('1')" type="radio" id="star1" name="rate" value="1"/>
+                                    <label onclick="starChanger('1')" for="star1" title="text">1 star</label>
+                                </div>
+                                <input type="hidden" value="5" id="starHolder">
+                                <!-- Text area -->
+                                <textarea class="form-control mb-3" id="TextAreaComment"
+                                          placeholder="Your review" rows="3"></textarea>
+                                <p class="text-danger-emphasis" id="low_char">دیدگاه شما باید بیشتر از 13 حرف باشد</p>
+                                <!-- Button -->
+                                <button onclick="commentSubmit()" type="submit" class="btn btn-primary mb-0">ثبت نظر <i
+                                        class="bi fa-fw bi-arrow-right ms-2"></i></button>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Review END -->
+                </div>
+            </div>
+        </section>
+        <input type="hidden" value="{{ product.id }}" id="Products">
+        <!-- =======================
+        Rating and review END -->
+
+        <!-- =======================
+        Related Products START -->
+        <section class="pt-0 pt-md-5">
+            <div class="container">
+                <!-- Title -->
+                <div class="mb-4">
+                    <h2 class="mb-0">کالاهای مشابه</h2>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Slider item START -->
+                    <div class="col-md-12">
+                        <div class="tiny-slider arrow-hover arrow-dark arrow-blur arrow-round">
+                            <div class="tns-outer" id="tns1-ow">
+                                <div class="tns-liveregion tns-visually-hidden" aria-live="polite" aria-atomic="true">
+                                    <span class="current">5 to 9</span> از 5
+                                </div>
+                                <div id="tns1-mw" class="tns-ovh">
+                                    <div class="tns-inner" id="tns1-iw">
+                                        <div class="tiny-slider-inner  tns-slider tns-carousel tns-subpixel tns-calc tns-horizontal"
+                                             data-autoplay="false" data-hoverpause="true" data-gutter="24" data-edge="2"
+                                             data-arrow="true" data-dots="false" data-items-xl="4" data-items-lg="3"
+                                             data-items-md="2" data-items-xs="1" id="tns1"
+                                             style="transform: translate3d(21.7391%, 0px, 0px);">
+                                            {% comment %}<div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/04.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کاپشن مردانه
+                                                            چرم کن</a></h5>
+                                                        <h6 class="mb-0 text-success">98000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/08.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">ست 6 تکه لباس
+                                                            ورزشی</a></h5>
+                                                        <h6 class="mb-0 text-success">105000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/06.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">بوت زنانه چرم
+                                                            آرا</a></h5>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <h6 class="text-success mb-0 me-2">75000 تومان</h6>
+                                                            <small class="text-decoration-line-through">95000
+                                                                تومان</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/07.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">اجاق گاز
+                                                            پیکنیکی مدل مخزن</a></h5>
+                                                        <h6 class="mb-0 text-success">81000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned tns-slide-active">
+                                                <div class="card border p-3 h-100">
+                                                    <div class="position-relative">
+                                                        <!-- Image -->
+                                                        <a href="shop-detail.html"
+                                                           class="position-relative z-index-9"><img class="card-img"
+                                                                                                    src="/static/images/shop/02.png"
+                                                                                                    alt=""></a>
+                                                        <!-- Overlay -->
+                                                        <div class="card-img-overlay p-0">
+                                                            <span class="badge text-bg-success">جدید</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کوله پشتی
+                                                            ورزشی مدل کلاسیک</a></h5>
+                                                        <h6 class="mb-0 text-success">103000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned tns-slide-active">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/04.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کاپشن مردانه
+                                                            چرم کن</a></h5>
+                                                        <h6 class="mb-0 text-success">98000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned tns-slide-active">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/08.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">ست 6 تکه لباس
+                                                            ورزشی</a></h5>
+                                                        <h6 class="mb-0 text-success">105000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned tns-slide-active">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/06.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">بوت زنانه چرم
+                                                            آرا</a></h5>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <h6 class="text-success mb-0 me-2">75000 تومان</h6>
+                                                            <small class="text-decoration-line-through">95000
+                                                                تومان</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned tns-slide-active">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/07.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">اجاق گاز
+                                                            پیکنیکی مدل مخزن</a></h5>
+                                                        <h6 class="mb-0 text-success">81000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>{% endcomment %}
+
+
+                                            <!-- Slider item START -->
+                                            {% for related_product in related_products %}
+                                                <div class="tns-item" id="tns1-item1" aria-hidden="true" tabindex="-1">
+                                                    <div class="card border p-3 h-100">
+                                                        <!-- Image -->
+                                                        <a href="shop-detail.html"><img class="card-img"
+                                                                                        src="{{ related_product.image.url }}"
+                                                                                        alt=""></a>
+
+                                                        <!-- Card body -->
+                                                        <div class="card-body text-center p-3 px-0">
+                                                            <!-- Badge and price -->
+                                                            <div class="d-flex justify-content-center mb-2">
+                                                                <ul class="list-inline mb-0">
+                                                                    <li class="list-inline-item me-0 small"><i
+                                                                            class="fas fa-star text-warning"></i></li>
+                                                                    <li class="list-inline-item me-0 small"><i
+                                                                            class="fas fa-star text-warning"></i></li>
+                                                                    <li class="list-inline-item me-0 small"><i
+                                                                            class="fas fa-star text-warning"></i></li>
+                                                                    <li class="list-inline-item me-0 small"><i
+                                                                            class="fas fa-star text-warning"></i></li>
+                                                                    <li class="list-inline-item me-0 small"><i
+                                                                            class="fas fa-star-half-alt text-warning"></i>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                            <!-- Title -->
+                                                            <h5 class="card-title"><a
+                                                                    href="shop-detail.html">{{ related_product.title }}
+                                                            </a></h5>
+                                                            <h6 class="mb-0 text-success">{{ related_product.price | three_digits_currency }}</h6>
+                                                        </div>
+
+                                                        <!-- Card footer -->
+                                                        <div class="card-footer text-center p-0">
+                                                            <!-- Button -->
+                                                            <a onclick="add_product_to_order('{{ related_product.id }}','false')"
+                                                               href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                    class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+
+
+                                            <!-- Slider item END -->
+                                            {% comment %}<div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <div class="position-relative">
+                                                        <!-- Image -->
+                                                        <a href="shop-detail.html"
+                                                           class="position-relative z-index-9"><img class="card-img"
+                                                                                                    src="/static/images/shop/02.png"
+                                                                                                    alt=""></a>
+                                                        <!-- Overlay -->
+                                                        <div class="card-img-overlay p-0">
+                                                            <span class="badge text-bg-success">جدید</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کوله پشتی
+                                                            ورزشی مدل کلاسیک</a></h5>
+                                                        <h6 class="mb-0 text-success">103000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/04.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کاپشن مردانه
+                                                            چرم کن</a></h5>
+                                                        <h6 class="mb-0 text-success">98000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>{% endcomment %}
+                                            {% comment %}<div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/08.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">ست 6 تکه لباس
+                                                            ورزشی</a></h5>
+                                                        <h6 class="mb-0 text-success">105000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/06.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">بوت زنانه چرم
+                                                            آرا</a></h5>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <h6 class="text-success mb-0 me-2">75000 تومان</h6>
+                                                            <small class="text-decoration-line-through">95000
+                                                                تومان</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/07.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">اجاق گاز
+                                                            پیکنیکی مدل مخزن</a></h5>
+                                                        <h6 class="mb-0 text-success">81000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <div class="position-relative">
+                                                        <!-- Image -->
+                                                        <a href="shop-detail.html"
+                                                           class="position-relative z-index-9"><img class="card-img"
+                                                                                                    src="/static/images/shop/02.png"
+                                                                                                    alt=""></a>
+                                                        <!-- Overlay -->
+                                                        <div class="card-img-overlay p-0">
+                                                            <span class="badge text-bg-success">جدید</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کوله پشتی
+                                                            ورزشی مدل کلاسیک</a></h5>
+                                                        <h6 class="mb-0 text-success">103000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/04.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">کاپشن مردانه
+                                                            چرم کن</a></h5>
+                                                        <h6 class="mb-0 text-success">98000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/08.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">ست 6 تکه لباس
+                                                            ورزشی</a></h5>
+                                                        <h6 class="mb-0 text-success">105000 تومان</h6>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="tns-item tns-slide-cloned" aria-hidden="true" tabindex="-1">
+                                                <div class="card border p-3 h-100">
+                                                    <!-- Image -->
+                                                    <a href="shop-detail.html"><img class="card-img"
+                                                                                    src="/static/images/shop/06.png"
+                                                                                    alt=""></a>
+
+                                                    <!-- Card body -->
+                                                    <div class="card-body text-center p-3 px-0">
+                                                        <!-- Badge and price -->
+                                                        <div class="d-flex justify-content-center mb-2">
+                                                            <ul class="list-inline mb-0">
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star text-warning"></i></li>
+                                                                <li class="list-inline-item me-0 small"><i
+                                                                        class="fas fa-star-half-alt text-warning"></i>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                        <!-- Title -->
+                                                        <h5 class="card-title"><a href="shop-detail.html">بوت زنانه چرم
+                                                            آرا</a></h5>
+                                                        <div class="d-flex align-items-center justify-content-center">
+                                                            <h6 class="text-success mb-0 me-2">75000 تومان</h6>
+                                                            <small class="text-decoration-line-through">95000
+                                                                تومان</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Card footer -->
+                                                    <div class="card-footer text-center p-0">
+                                                        <!-- Button -->
+                                                        <a href="#" class="btn btn-sm btn-primary-soft mb-0"><i
+                                                                class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                                    </div>
+                                                </div>
+                                            </div>{% endcomment %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% comment %}<div class="tns-controls" aria-label="Carousel Navigation" tabindex="0">
+                                    <button class="zzon" type="button" data-controls="prev" tabindex="-1" aria-controls="tns1"><i
+                                            class="fas fa-chevron-left"></i></button>
+                                    <button class="zzon" type="button" data-controls="next" tabindex="-1" aria-controls="tns1"><i
+                                            class="fas fa-chevron-right"></i></button>
+                                </div>{% endcomment %}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Slider item END -->
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        Related Products END -->
+
+    </main>
+{% endblock %}
+{% block footer_refrences %}
+    <script src="/static/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/tiny-slider/tiny-slider-rtl.js"></script>
+    <script src="/static/vendor/glightbox/js/glightbox.js"></script>
+    <script src="/static/js/functions.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.min.js"></script>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends 'shared/_layout.html' %}
+{% block title %}
+    درباره ما | بلاگینز
+{% endblock %}
+{% block header_refrences %}
+    <!-- Dark mode -->
+    <script>
+        const storedTheme = localStorage.getItem('theme')
+
+        const getPreferredTheme = () => {
+            if (storedTheme) {
+                return storedTheme
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const setTheme = function (theme) {
+            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+        }
+
+        setTheme(getPreferredTheme())
+
+        window.addEventListener('DOMContentLoaded', () => {
+            var el = document.querySelector('.theme-icon-active');
+            if (el != 'undefined' && el != null) {
+                const showActiveTheme = theme => {
+                    const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                    const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+
+                    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                        element.classList.remove('active')
+                    })
+
+                    btnToActive.classList.add('active')
+                    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                }
+
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (storedTheme !== 'light' || storedTheme !== 'dark') {
+                        setTheme(getPreferredTheme())
+                    }
+                })
+
+                showActiveTheme(getPreferredTheme())
+
+                document.querySelectorAll('[data-bs-theme-value]')
+                    .forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const theme = toggle.getAttribute('data-bs-theme-value')
+                            localStorage.setItem('theme', theme)
+                            setTheme(theme)
+                            showActiveTheme(theme)
+                        })
+                    })
+
+            }
+        })
+
+    </script>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap-icons/bootstrap-icons.css">
+
+    <!-- Theme CSS -->
+    <link id="style-switch" rel="stylesheet" type="text/css" href="/static/css/style-rtl.css">
+
+{% endblock %}
+
+{% block content %}
+    <main>
+
+        <!-- =======================
+        Inner intro START -->
+        <section class="pt-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card bg-dark-overlay-4 overflow-hidden card-bg-scale h-400 text-center"
+                             style="background-image:url({{ about_us.head_image.url }}); background-position: center left; background-size: cover;">
+                            <!-- Card Image overlay -->
+                            <div class="card-img-overlay d-flex align-items-center p-3 p-sm-4">
+                                <div class="w-100 my-auto">
+                                    <h1 class="text-white display-5">درباره ما</h1>
+                                    <!-- breadcrumb -->
+                                    <nav class="d-flex justify-content-center" aria-label="breadcrumb">
+                                        <ol class="breadcrumb breadcrumb-dark breadcrumb-dots mb-0">
+                                            <li class="breadcrumb-item"><a href="{% url 'index_page' %}"><i
+                                                    class="bi bi-house me-1"></i> خانه</a></li>
+                                            <li class="breadcrumb-item active">درباره ما</li>
+                                        </ol>
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        Inner intro END -->
+
+        <!-- =======================
+        About START -->
+        <section class="pt-4 pb-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xl-9 mx-auto">
+                        <h2>{{ about_us.first_title }}</h2>
+                        <p class="lead">
+                            {{ about_us.first_text }}
+                        </p>
+                        <h3 class="mt-4">{{ about_us.second_title }}</h3>
+                        <ul>
+                            <li>
+                                <p>{{ about_us.first_goal_text }}</p>
+                            </li>
+                            <li>
+                                <p>{{ about_us.second_goal_text }}</p>
+                            </li>
+                            <li>
+                                <p>{{ about_us.third_goal_text }}</p>
+                            </li>
+                        </ul>
+                        <!-- Team START -->
+                        <h3 class="mb-3 mt-5">کارشناسان ما</h3>
+                        <div class="row g-4">
+                            {% for expert in experts %}
+                                <!-- Team item-->
+                                <div class="col-sm-6 col-lg-3">
+                                    <div class="text-center">
+                                        <!-- Avatar img -->
+                                        <div class="avatar avatar-xxl mb-2">
+                                            <img class="avatar-img rounded-circle" src="{{ expert.image.url }}"
+                                                 alt="avatar">
+                                        </div>
+                                        <h5>{{ expert.full_name }}</h5>
+                                        <p class="m-0">{{ expert.roll }}</p>
+                                        <ul class="nav justify-content-center">
+                                            {% if expert.face_book %}
+                                                <li class="nav-item">
+                                                    <a class="nav-link px-2 fs-5" href="http://{{ expert.face_book }}"><i
+                                                            class="fab fa-facebook-square"></i></a>
+                                                </li>
+                                            {% endif %}
+                                            {% if expert.twitter %}
+                                            	<li class="nav-item">
+                                                <a class="nav-link px-2 fs-5" href="http://www.{{ expert.twitter }}"><i
+                                                        class="fab fa-twitter-square"></i></a>
+                                            </li>
+                                            {% endif %}
+                                            {% if expert.email %}
+                                            	<li class="nav-item">
+                                                <a class="nav-link px-2 fs-5" href="{{ expert.email }}"><i
+                                                        class="far fa-envelope"></i></a>
+                                            </li>
+                                            {% endif %}
+
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endfor %}
+
+                        </div>
+                        <!-- Team END -->
+                        <!-- Service START -->
+
+                        <!-- Service END -->
+                    </div>  <!-- Col END -->
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        About END -->
+
+    </main>
+{% endblock %}
+
+{% block footer_refrences %}
+    <script src="/static/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/functions.js"></script>
+{% endblock %}

@@ -1,18 +1,19 @@
 {% load render_partial %}
 <!DOCTYPE html>
-<html lang="fa" dir="rtl" >
+<html lang="fa" dir="rtl">
 <head>
-	<title>{% block title %}{% endblock %}</title>
-	<!-- Meta Tags -->
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="author" content="Blogzine">
-	<meta name="description" content="قالب وبلاگ و مجله خبری مبتنی بر بوت استرپ">
-
-    {% include 'shared/header_refrences.html' %}
-
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Meta Tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="author" content="Blogzine">
+    <meta name="description" content="قالب وبلاگ و مجله خبری مبتنی بر بوت استرپ">
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
     {% block header_refrences %}{% endblock %}
 </head>
+
+<body>
 
 
 {% render_partial 'home.views.site_header_components' %}
@@ -21,9 +22,11 @@
 
 {% render_partial 'home.views.site_footer_components' %}
 
-{% include 'shared/footer_refrences.html' %}
 
 {% block footer_refrences %}{% endblock %}
-
+<script src="/static/js/custom.js"></script>
 </body>
+
+
+
 </html>

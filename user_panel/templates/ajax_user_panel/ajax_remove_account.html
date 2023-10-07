@@ -1,0 +1,18 @@
+<h6>قبل از حذف به نکات زیر دقت نمایید...</h6>
+<ul>
+    <li>با حذف حساب کاربری خود هیچ راهی برای بازیابی آن وجود نخواهد داشت.</li>
+    <li>با حذف حساب کاربری خود در صورت وجود سابقه خرید محصول برخی از اطلاعات شما پاک
+        نمیشود
+    </li>
+</ul>
+<div class="form-check form-check-md my-3">
+    <label class="form-check-label" for="deleteaccountCheck">بله، می خواهم حساب خود
+        را
+        حذف کنم.</label>
+    {{ delete_form.box }}
+    <div class="text-danger-emphasis">{{ delete_form.box.errors }}</div>
+
+</div>
+<button onclick="DeleteAccount()" name="deleteacount1" type="button" class="btn btn-sm btn-danger mb-0 me-2">
+    حذف
+</button>

@@ -42,12 +42,16 @@ INSTALLED_APPS = [
     'contact_us',
     'polls',
     'product',
+    'order_basket',
+    'articles',
+    'about_us',
     # external
     'django_render_partial',
     'jalali_date',
     'sorl.thumbnail',
     'sweetify',
     'captcha',
+    'selenium',
 ]
 CAPTCHA_IMAGE_SIZE = [105, 40]
 CAPTCHA_FONT_SIZE = 30

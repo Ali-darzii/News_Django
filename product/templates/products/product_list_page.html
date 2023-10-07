@@ -1,276 +1,417 @@
 {% extends 'shared/_layout.html' %}
-
+{% load render_partial %}
+{% load poll_extras %}
+{% load poll_extras %}
 {% block title %}
     محصولات | بلاگینز
 {% endblock %}
+{% block header_refrences %}
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.css">
 
+    <!-- Dark mode -->
+    <script>
+        const storedTheme = localStorage.getItem('theme')
+
+        const getPreferredTheme = () => {
+            if (storedTheme) {
+                return storedTheme
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const setTheme = function (theme) {
+            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+        }
+
+        setTheme(getPreferredTheme())
+
+        window.addEventListener('DOMContentLoaded', () => {
+            var el = document.querySelector('.theme-icon-active');
+            if (el != 'undefined' && el != null) {
+                const showActiveTheme = theme => {
+                    const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                    const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+
+                    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                        element.classList.remove('active')
+                    })
+
+                    btnToActive.classList.add('active')
+                    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                }
+
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (storedTheme !== 'light' || storedTheme !== 'dark') {
+                        setTheme(getPreferredTheme())
+                    }
+                })
+
+                showActiveTheme(getPreferredTheme())
+
+                document.querySelectorAll('[data-bs-theme-value]')
+                    .forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const theme = toggle.getAttribute('data-bs-theme-value')
+                            localStorage.setItem('theme', theme)
+                            setTheme(theme)
+                            showActiveTheme(theme)
+                        })
+                    })
+
+            }
+        })
+
+    </script>
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap-icons/bootstrap-icons.css">
+
+    <!-- Theme CSS -->
+    <link id="style-switch" rel="stylesheet" type="text/css" href="/static/css/style-rtl.css">
+
+
+{% endblock %}
 {% block content %}
-<main>
+    <main>
 
-<!-- =======================
-Main START -->
-<section class="pt-3 pt-lg-5">
-	<div class="container">
-		<div class="row">
-      <!-- Title -->
-      <div class="mb-4">
-        <h2 class="m-0">جستجو محصول</h2>
-      </div>
+        <!-- =======================
+        Main START -->
+        <section class="pt-3 pt-lg-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <h2 class="m-0">جستجو محصول</h2>
+                    </div>
 
-			<!-- Filter START -->
-			<aside class="col-xl-4 col-xxl-3">
-				<!-- Responsive offcanvas body START -->
-				<div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
-					<div class="offcanvas-header bg-light">
-						<h5 class="offcanvas-title" id="offcanvasSidebarLabel">جستجو پیشرفته</h5>
-						<button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
-					</div>
-					<div class="offcanvas-body flex-column p-3 p-xl-0">
-						<form class="border rounded-2">
-							<!-- Availability START -->
-							<div class="card card-body">
-								<!-- Title -->
-								<h6 class="mb-3">دسترسی</h6>
+                    <!-- Filter START -->
+                    <aside class="col-xl-4 col-xxl-3">
+                        <!-- Responsive offcanvas body START -->
+                        <div class="offcanvas-xl offcanvas-end" tabindex="-1" id="offcanvasSidebar"
+                             aria-labelledby="offcanvasSidebarLabel">
+                            <div class="offcanvas-header bg-light">
+                                <h5 class="offcanvas-title" id="offcanvasSidebarLabel">جستجو پیشرفته</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                                        data-bs-target="#offcanvasSidebar" aria-label="Close"></button>
+                            </div>
+                            <div class="offcanvas-body flex-column p-3 p-xl-0">
+                                <div class="border rounded-2">
 
-								<!-- Availability group -->
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" checked="">
-									<label class="form-check-label" for="flexRadioDefault1">
-										همه
-									</label>
-								</div>
-								<div class="form-check">
-									<input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
-									<label class="form-check-label" for="flexRadioDefault2">
-										موجود
-									</label>
-								</div>
-							</div>
-							<!-- Availability END -->
+                                    <!-- Availability START -->
 
-							<hr class="my-0"> <!-- Divider -->
+                                    <div class="card card-body">
+                                        <!-- Title -->
+                                        <h6 class="mb-3">دسترسی</h6>
 
-							<!-- Offer type START -->
-							<div class="card card-body">
-								<!-- Title -->
-								<h6 class="mb-3">نوع پیشنهاد</h6>
+                                        <!-- Availability group -->
+                                        <div class="form-check">
+                                            <input onclick="filterProduct()" class="form-check-input"
+                                                   data-filter="availability"
+                                                   value="all" type="radio" name="flexRadioDefault"
+                                                   id="flexRadioDefault1"
+                                                   checked="">
+                                            <label class="form-check-label" for="flexRadioDefault1">
+                                                همه
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input onclick="filterProduct()" class="form-check-input"
+                                                   data-filter="availability"
+                                                   value="available" type="radio" name="flexRadioDefault"
+                                                   id="flexRadioDefault2">
+                                            <label class="form-check-label" for="flexRadioDefault2">
+                                                موجود
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- Availability END -->
 
-								<!-- Checkbox -->
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="amenitiesType1">
-									<label class="form-check-label" for="amenitiesType1">تخفیف</label>
-								</div>
-								<!-- Checkbox -->
-								<div class="form-check">
-									<input class="form-check-input" type="checkbox" value="" id="amenitiesType2">
-									<label class="form-check-label" for="amenitiesType2">پیشنهادی</label>
-								</div>
-							</div>
-							<!-- Offer type END -->
+                                    <hr class="my-0"> <!-- Divider -->
 
-							<hr class="my-0"> <!-- Divider -->
+                                    <!-- Offer type START -->
 
-							<!-- Brands START -->
-							<div class="card card-body">
-								<!-- Title -->
-								<h6 class="mb-2">برند</h6>
-								<!-- Amenities group -->
-								<div class="col-12">
-
-									<!-- Checkbox -->
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" value="" id="amenitiesType11">
-										<label class="form-check-label" for="amenitiesType11">جامه پوش</label>
-									</div>
-									<!-- Checkbox -->
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" value="" id="amenitiesType12">
-										<label class="form-check-label" for="amenitiesType12">پاتن جامه</label>
-									</div>
-									<!-- Checkbox -->
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" value="" id="amenitiesType13">
-										<label class="form-check-label" for="amenitiesType13">سامسونگ</label>
-									</div>
-									<!-- Checkbox -->
-									<div class="form-check">
-										<input class="form-check-input" type="checkbox" value="" id="amenitiesType14">
-										<label class="form-check-label" for="amenitiesType14">اپل</label>
-									</div>
-
-									<!-- Collapse body -->
-									<div class="multi-collapse collapse" id="amenitiesCollapes">
-										<!-- Checkbox -->
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" value="" id="amenitiesType15">
-											<label class="form-check-label" for="amenitiesType15">هالیدی</label>
-										</div>
-										<!-- Checkbox -->
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" value="" id="amenitiesType16">
-											<label class="form-check-label" for="amenitiesType16">پالیتوک</label>
-										</div>
-										<!-- Checkbox -->
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" value="" id="amenitiesType17">
-											<label class="form-check-label" for="amenitiesType17">شیائومی</label>
-										</div>
-										<!-- Checkbox -->
-										<div class="form-check">
-											<input class="form-check-input" type="checkbox" value="" id="amenitiesType18">
-											<label class="form-check-label" for="amenitiesType18">ال جی</label>
-										</div>
-									</div>
-									<!-- Collapse button -->
-									<a class="p-0 mb-0 mt-2 btn-more d-flex align-items-center collapsed" data-bs-toggle="collapse" href="#amenitiesCollapes" role="button" aria-expanded="false" aria-controls="amenitiesCollapes">
-										مشاهده <span class="see-more ms-1">بیشتر</span><span class="see-less ms-1">کمتر</span><i class="fas fa-angle-down ms-2"></i>
-									</a>
-								</div>
-							</div>
-							<!-- Brands END -->
-
-							<hr class="my-0"> <!-- Divider -->
-
-							<!-- Rating Star START -->
-							<div class="card card-body">
-								<!-- Title -->
-								<h6 class="mb-2">امتیاز</h6>
-								<!-- Rating Star group -->
-								<ul class="list-inline mb-0 g-3">
-									<!-- Item -->
-									<li class="list-inline-item mb-0">
-										<input type="checkbox" class="btn-check" id="btn-check-6">
-										<label class="btn btn-sm btn-light btn-primary-soft-check" for="btn-check-6">1<i class="bi bi-star-fill"></i></label>
-									</li>
-									<!-- Item -->
-									<li class="list-inline-item mb-0">
-										<input type="checkbox" class="btn-check" id="btn-check-7">
-										<label class="btn btn-sm btn-light btn-primary-soft-check" for="btn-check-7">2<i class="bi bi-star-fill"></i></label>
-									</li>
-									<!-- Item -->
-									<li class="list-inline-item mb-0">
-										<input type="checkbox" class="btn-check" id="btn-check-8">
-										<label class="btn btn-sm btn-light btn-primary-soft-check" for="btn-check-8">3<i class="bi bi-star-fill"></i></label>
-									</li>
-									<!-- Item -->
-									<li class="list-inline-item mb-0">
-										<input type="checkbox" class="btn-check" id="btn-check-15">
-										<label class="btn btn-sm btn-light btn-primary-soft-check" for="btn-check-15">4<i class="bi bi-star-fill"></i></label>
-									</li>
-									<!-- Item -->
-									<li class="list-inline-item mb-0">
-										<input type="checkbox" class="btn-check" id="btn-check-16">
-										<label class="btn btn-sm btn-light btn-primary-soft-check" for="btn-check-16">5<i class="bi bi-star-fill"></i></label>
-									</li>
-								</ul>
-							</div>
-							<!-- Rating Star END -->
-						</form><!-- Form End -->
-					</div>
-					<!-- Buttons -->
-					<div class="d-flex justify-content-between p-2 p-xl-0 mt-xl-3">
-						<button class="btn btn-link p-0 mb-0">حذف همه</button>
-						<button class="btn btn-primary mb-0">نتیجه فیلتر</button>
-					</div>
-				</div>
-				<!-- Responsive offcanvas body END -->
-			</aside>
-			<!-- Filter END -->
-
-			<!-- Main part START -->
-			<div class="col-xl-9">
-
-				<!-- Search filter START -->
-				<form class="row g-2 g-xl-4 mb-4">
-					<!-- Search -->
-					<div class="col-xl-6">
-            <div class="rounded position-relative">
-							<input class="form-control pe-5" type="search" placeholder="جستجو..." aria-label="Search">
-							<button class="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y" type="submit"><i class="bi bi-search fs-5"> </i></button>
-						</div>
-					</div>
-
-					<!-- Select -->
-					<div class="col-md-4 col-xl-3">
-						<select class="form-select" aria-label="نمونه انتخاب پیش فرض">
-							<option selected="">فیلتر</option>
-							<option value="1">تی شرت</option>
-							<option value="2">کفش</option>
-							<option value="3">کوله پشتی</option>
-						</select>
-					</div>
-
-					<!-- Select -->
-					<div class="col-md-4 col-xl-3">
-						<select class="form-select" aria-label="نمونه انتخاب پیش فرض">
-							<option selected="">مرتب سازی براساس</option>
-							<option value="1">نام</option>
-							<option value="2">ارزان ترین</option>
-							<option value="3">گران ترین</option>
-						</select>
-					</div>
-
-          <div class="col-md-4 col-xl-3 d-grid d-xl-none">
-            <!-- Filter offcanvas button -->
-						<button class="btn btn-primary-soft btn-primary-check mb-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
-							<i class="fas fa-sliders-h me-1"></i> نمایش فیلتر
-						</button>
-          </div>
-				</form>
-				<!-- Search filter END -->
-
-				<!-- Product START -->
-				<div class="row g-4">
-
-					<!-- Adv START -->
-					<div class="col-12">
-						<div class="rounded-2 bg-dark-overlay-5 overflow-hidden p-4 p-md-5" style="background-image: url(/static/images/shop/bg-offer.jpg);">
-							<div class="d-md-flex justify-content-between align-items-center">
-								<h4 class="text-white mb-2 mb-md-0">با سفارش های بالای 100 هزار تومان تا 40 درصد صرفه جویی کنید.</h4>
-								<a href="#" class="btn btn-primary mb-0">خرید</a>
-							</div>
-						</div>
-					</div>
-					<!-- Adv END -->
-
-					<!-- Product item START -->
-                    {% for product in product_list %}
-
-                    {% include 'includes/product_item.html' %}
-
-                    {% endfor %}
+                                    <div class="card card-body">
+                                        <!-- Title -->
+                                        <h6 class="mb-3">دسته بندی</h6>
 
 
-					<!-- Pagination START -->
-					<div class="col-12">
-						<nav class="d-flex justify-content-center" aria-label="navigation">
-							<!-- Pagination 1 2 3  -->
-							<ul class="pagination pagination-bordered justify-content-center d-inline-block d-lg-flex">
-								<li class="page-item">
-									<a class="page-link" href="#">قبلی</a>
-								</li>
-								<li class="page-item"><a class="page-link" href="#">1</a></li>
-								<li class="page-item active"><a class="page-link" href="#">2</a></li>
-								<li class="page-item disabled"><a class="page-link" href="#">..</a></li>
-								<li class="page-item"><a class="page-link" href="#">22</a></li>
-								<li class="page-item"><a class="page-link" href="#">23</a></li>
-								<li class="page-item">
-									<a class="page-link" href="#">بعدی</a>
-								</li>
-							</ul>
-						</nav>
-					</div>
-					<!-- Pagination END -->
-				</div>
-				<!-- Product END -->
+                                        {% render_partial 'product.views.product_category_component' %}
+                                        <input type="hidden" id="page" value="1">
 
-			</div>
-			<!-- Main part END -->
-		</div>
-	</div>
-</section>
-<!-- =======================
-Main END -->
+                                    </div>
 
-</main>
+                                    <!-- Offer type END -->
+
+                                    <hr class="my-0"> <!-- Divider -->
+
+
+                                    <!-- Brands START -->
+                                    <div class="card card-body">
+                                        <!-- Title -->
+                                        <h6 class="mb-2">برند</h6>
+                                        <!-- Amenities group -->
+                                        <div class="col-12">
+
+                                            {% render_partial 'product.views.product_brand_component' %}
+
+                                        </div>
+                                    </div>
+
+                                    <!-- Brands END -->
+
+                                    <hr class="my-0"> <!-- Divider -->
+
+                                    <!-- Rating Star START -->
+                                    <div class="card card-body ">
+                                        <!-- Title -->
+                                        <h6 class="mb-2">امتیاز</h6>
+                                        <!-- Rating Star group -->
+                                        <ul class="list-inline mb-0 g-3">
+                                            <!-- Item -->
+                                            <li class="list-inline-item mb-0">
+                                                <input onclick="filterProduct()" name="same-name" autocomplete="off"
+                                                       data-filter="stars" value="1" type="checkbox"
+                                                       class="btn-check form-check-input" id="btn-check-6">
+                                                <label class="btn btn-sm btn-light btn-primary-soft-check"
+                                                       for="btn-check-6">1<i class="bi bi-star-fill"></i></label>
+                                            </li>
+                                            <!-- Item -->
+                                            <li class="list-inline-item mb-0 ">
+                                                <input onclick="filterProduct()" name="same-name" autocomplete="off"
+                                                       data-filter="stars" value="2" type="checkbox"
+                                                       class="btn-check form-check-input" id="btn-check-7">
+                                                <label class="btn btn-sm btn-light btn-primary-soft-check"
+                                                       for="btn-check-7">2<i class="bi bi-star-fill"></i></label>
+                                            </li>
+                                            <!-- Item -->
+                                            <li class="list-inline-item mb-0 ">
+                                                <input onclick="filterProduct()" name="same-name" autocomplete="off"
+                                                       data-filter="stars" value="3" type="checkbox"
+                                                       class="btn-check form-check-input" id="btn-check-8">
+                                                <label class="btn btn-sm btn-light btn-primary-soft-check"
+                                                       for="btn-check-8">3<i class="bi bi-star-fill"></i></label>
+                                            </li>
+                                            <!-- Item -->
+                                            <li class="list-inline-item mb-0 ">
+                                                <input onclick="filterProduct()" name="same-name" autocomplete="off"
+                                                       data-filter="stars" value="4" type="checkbox"
+                                                       class="btn-check form-check-input" id="btn-check-15">
+                                                <label class="btn btn-sm btn-light btn-primary-soft-check"
+                                                       for="btn-check-15">4<i class="bi bi-star-fill"></i></label>
+                                            </li>
+                                            <!-- Item -->
+                                            <li class="list-inline-item mb-0 ">
+                                                <input onclick="filterProduct()" name="same-name" autocomplete="off"
+                                                       data-filter="stars" value="5" type="checkbox"
+                                                       class="btn-check form-check-input" id="btn-check-16">
+                                                <label class="btn btn-sm btn-light btn-primary-soft-check"
+                                                       for="btn-check-16">5<i class="bi bi-star-fill"></i></label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <hr class="my-0"> <!-- Divider -->
+
+                                </div>
+                            </div>
+
+
+                            <!-- Buttons -->
+                            {% comment %} <div class="d-flex justify-content-between p-2 p-xl-0 mt-xl-3">
+                                <button class="btn btn-link p-0 mb-0">حذف همه</button>
+                                <button class="btn btn-primary mb-0" type="button" id="filter_button">نتیجه فیلتر</button>
+                            </div>{% endcomment %}
+
+                        </div>
+                        <!-- Responsive offcanvas body END -->
+                    </aside>
+                    <!-- Filter END -->
+
+                    <!-- Main part START -->
+                    <div class="col-xl-9">
+
+                        <!-- Search filter START -->
+                        <div class="row g-2 g-xl-4 mb-4">
+                            <!-- Search -->
+                            <div class="col-xl-6">
+                                <div class="rounded position-relative">
+                                    <input type="hidden" id="Deside" value="">
+                                    <input class="form-control pe-5" id="q" type="search" placeholder="جستجو..."
+                                           aria-label="Search">
+                                    <button onclick="searchProduct()"
+                                            class="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y"
+                                            type="submit"><i class="bi bi-search fs-5"> </i></button>
+                                </div>
+                            </div>
+
+                            <!-- Select -->
+                            <div class="col-md-4 col-xl-3">
+                                <select id="sortSelect" class="form-select" aria-label="نمونه انتخاب پیش فرض">
+                                    <option selected="" disabled>مرتب سازی براساس</option>
+                                    <option value="A-Z" onclick="sortedProduct()">نام</option>
+                                    <option value="down" onclick="sortedProduct()">ارزان ترین</option>
+                                    <option value="high" onclick="sortedProduct()">گران ترین</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 col-xl-3 d-grid d-xl-none">
+                                <!-- Filter offcanvas button -->
+                                <button class="btn btn-primary-soft btn-primary-check mb-0" type="button"
+                                        data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar"
+                                        aria-controls="offcanvasSidebar">
+                                    <i class="fas fa-sliders-h me-1"></i> نمایش فیلتر
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Search filter END -->
+
+                        <!-- Product START -->
+                        <div class="row g-4" id="filteredProducts">
+
+                            <!-- Adv START -->
+                            <div class="col-12">
+                                <div class="rounded-2 bg-dark-overlay-5 overflow-hidden p-4 p-md-5"
+                                     style="background-image: url(/static/images/shop/bg-offer.jpg);">
+                                    <div class="d-md-flex justify-content-between align-items-center">
+                                        <h4 class="text-white mb-2 mb-md-0">با سفارش های بالای 100 هزار تومان تا 40 درصد
+                                            صرفه جویی کنید.</h4>
+                                        <a href="#" class="btn btn-primary mb-0">خرید</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Adv END -->
+
+                            <!-- Product item START -->
+
+                            {% for product in products_page %}
+
+                                <div id="GooGooli" class="col-sm-6 col-md-4">
+                                    <div class="card border p-3 h-100 product-box">
+                                        <div class="position-relative">
+                                            <!-- Image -->
+                                            <a href="{{ product.get_absolute_url }}"
+                                               class="position-relative z-index-9">
+                                                {% if product.image %}
+                                                    <img src="{{ product.image.url }}" alt="">
+                                                {% else %}
+                                                    <img class="card-img" src="/static/images/shop/image404.png" alt="">
+                                                {% endif %}
+                                            </a>
+                                            <!-- Card body -->
+                                            <div class="card-body text-center p-3 px-0">
+                                                <!-- Badge and price -->
+                                                <div class="d-flex justify-content-center mb-2">
+                                                    <ul class="list-inline mb-0">
+                                                        {% if product.half_star_average %}
+                                                            <li class="list-inline-item me-1">
+                                                            <i class="fas fa-star-half-alt text-warning"></i>
+                                                        {% endif %}
+                                                        {% for i in product.int_star_average %}
+                                                            <li class="list-inline-item me-0"><i
+                                                                    class="fas fa-star text-warning"></i></li>
+                                                        {% endfor %}
+
+                                                    </ul>
+
+                                                </div>
+                                                <!-- Title -->
+                                                <h5 class="card-title"><a
+                                                        href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+                                                </h5>
+                                                {% if product.inventory %}
+
+                                                    <h6 class="mb-0 text-success">{{ product.price|three_digits_currency }}</h6>
+                                                {% else %}
+                                                    <h6 class="mb-0 text-danger-emphasis">کالا موجود نمی باشد</h6>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                            <!-- Card footer -->
+                                            <div class="card-footer text-center p-0">
+                                                <!-- Button -->
+                                                <a onclick="add_product_to_order({{ product.id }},'false')" href="#"
+                                                   class="btn btn-sm btn-primary-soft mb-0"><i
+                                                        class="bi bi-cart me-2"></i>افزودن به سبد</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            {% endfor %}
+
+                            <div id="spinner" class="like-btn spinner-adjust ">
+                                <button class="btn btn-primary d-md-block btn-load-more" type="button">
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span>
+                                    ...Loading
+                                </button>
+                            </div>
+
+
+                            <div class="col-12" id="page_ul">
+                                <nav class="d-flex justify-content-center" aria-label="navigation">
+                                    <!-- Pagination 1 2 3  -->
+                                    <ul
+                                            class="pagination pagination-bordered justify-content-center d-inline-block d-lg-flex">
+                                        {% if products_page.has_previous %}
+                                            <li class="page-item cursor-pointer">
+                                                <a class="page-link cursor-pointer"
+                                                   onclick="fillPage({{ products_page.previous_page_number }})">قبلی</a>
+                                            </li>
+                                        {% endif %}
+
+                                        {% for pagenumber  in page_range %}
+                                            <li class="page-item cursor-pointer filter-btn{% if products_page.number == pagenumber %} active{% endif %} ">
+                                                <a class="page-link cursor-pointer"
+                                                   onclick="fillPage({{ pagenumber }})">{{ pagenumber }}</a>
+                                            </li>
+                                        {% endfor %}
+
+
+                                        {% if products_page.has_next %}
+                                            <li class="page-item cursor-pointer ">
+                                                <a class="page-link cursor-pointer"
+                                                   onclick="fillPage({{ products_page.next_page_number }})">بعدی</a>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            </div>
+
+
+                        </div>
+                        {#                        <div class="center-div col-md-10 text-start ">#}
+                        {#                            <button id="loadMore" data-limit="3" data-total="{{ total_product }}"#}
+                        {#                                    class="btn btn-primary w-100">محصولات بیشتر<i#}
+                        {#                                    class="fa fa-sync load-more-icon"></i></button>#}
+                        {#                        </div>#}
+                        <!-- Product END -->
+
+                    </div>
+                    <!-- Main part END -->
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        Main END -->
+
+    </main>
+
+{% endblock %}
+
+{% block footer_refrences %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.min.js"></script>
+    <script src="/static/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/functions.js"></script>
 {% endblock %}

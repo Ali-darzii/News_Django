@@ -1,4 +1,4 @@
-
+{% load poll_extras %}
 <div class="preloader animate__animated animate__fadeOut" style="display: none;">
     <div class="loader">
         <div class="sh1"></div>
@@ -15,43 +15,60 @@
     </div>
 
     <!-- Offcanvas body -->
+
     <div class="offcanvas-body d-flex flex-column px-3">
-        <div class="row g-3">
-            <!-- Image -->
-            <div class="col-3">
-                <img class="rounded-2 bg-light p-2" src="/static/images/shop/02.png" alt="avatar">
-            </div>
+        {% if order.orderdetail_set.all %}
+            {% for detail in order.orderdetail_set.all %}
+                <div class="row g-3 {% if not forloop.first %}header-basket{% endif %}">
+                    <!-- Image -->
+                    <div class="col-3">
+                        <img class="rounded-2 bg-light p-2" src="{{ detail.product.image.url }}" alt="avatar">
+                    </div>
 
-            <div class="col-6">
-                <h6 class="mb-1">کوله پشتی کوهنوردی</h6>
-                <div class="d-flex justify-content-between">
-                    <h6 class="mb-0 text-success">840000</h6>
-                    <a href="#" class="btn btn-sm btn-link">حذف</a>
+                    <div class="col-6">
+                        <div class="basket-product-title"><h6
+                                class="mb-1 text-basket-product-title">{{ detail.product.title }}</h6></div>
+                        <div class="d-flex justify-content-between">
+                            <h6 class="mb-0 text-success">{{ detail.product.price|three_digits_currency }}</h6>
+                            <a onclick="removeOrderDetail('{{ detail.id }}')" href="#"
+                               class="btn btn-sm btn-link">حذف</a>
+                        </div>
+                    </div>
+
+                    <div class="col-9 flost-s">
+                        <button onclick="changeOrderDetailCount('{{ detail.id }}','increase')"
+                                class="size-btn btn btn-info-soft" id="increase">+
+                        </button>
+                        <span id="number">{{ detail.count }}</span>
+                        <button onclick="changeOrderDetailCount('{{ detail.id }}','decrease')"
+                                class="size-btn btn btn-info-soft" id="decrease">-
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            <div class="col-3">
-                <!-- Select item -->
-                <select class="form-select form-select-sm" aria-label="Default select example">
-                    <option value="1">01</option>
-                    <option value="2">02</option>
-                    <option value="3">03</option>
-                </select>
-            </div>
-        </div>
-
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-danger">سبد خرید شما خالی است !!</div>
+        {% endif %}
         <!-- Button and price -->
         <div class="mt-auto">
             <div class="d-flex justify-content-between mb-2">
                 <h6 class="mb-0">جمع کل</h6>
-                <h5 class="text-success mb-0">84000 تومان</h5>
+                {% if count_is_zero %}
+                    <h5 class="text-success mb-0">0 تومان</h5>
+                {% else %}
+                    <h5 class="text-success mb-0">{{ sum|three_digits_currency }}</h5>
+                {% endif %}
+
             </div>
             <!-- Button -->
             <div class="d-grid">
-                <a href="checkout.html" class="btn btn-lg btn-primary-soft mb-0">پرداخت</a>
+                <a href="{% url 'order_basket_view' %}" class="btn btn-lg btn-primary-soft mb-0">رفتن به صفحه سبد
+                    خرید</a>
             </div>
         </div>
     </div>
+
+
 </div>
 
 
@@ -79,15 +96,13 @@
                 <ul class="navbar-nav navbar-nav-scroll mx-auto">
 
                     <!-- Nav item 1 Demos -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link " href="{% url 'index_page' %}" id="homeMenu" data-bs-toggle="dropdown"
-                           aria-haspopup="true" aria-expanded="false">خانه</a>
+                    <li class="nav-item ">
+                        <a class="nav-link " href="{% url 'index_page' %}">خانه</a>
                     </li>
 
                     <!-- Nav item 2 Pages -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link " href="{% url 'index_page' %}" id="homeMenu" data-bs-toggle="dropdown"
-                           aria-haspopup="true" aria-expanded="false">درباره ما</a>
+                        <a class="nav-link " href="{% url 'about_us_page' %}">درباره ما</a>
                     </li>
 
                     <!-- Nav item 3 Post -->
@@ -100,12 +115,16 @@
                             <li class="dropdown-submenu dropend">
                                 <a class="dropdown-item dropdown-toggle" href="#">اخبار</a>
                                 <ul class="dropdown-menu dropdown-menu-start" data-bs-popper="none">
-                                    <li><a class="dropdown-item" href="post-grid.html">تکنولوژی</a></li>
-                                    <li><a class="dropdown-item" href="post-grid-4-col.html">اقتصاد</a></li>
-                                    <li><a class="dropdown-item" href="post-grid-masonry.html">سیاسی</a></li>
-                                    <li><a class="dropdown-item" href="post-grid-masonry-filter.html">کودک و نوجوان</a>
+                                    {% for article_category in article_categories%}
+                                    	<li><a class="dropdown-item" href="{% url 'article_tech_list' category=article_category.url_title %}">{{ article_category.title }}</a></li>
+                                    {% endfor %}
+                                    {% comment %}
+                                    <li><a class="dropdown-item" href="{% url 'article_tech_list' category='technology' %}">تکنولوژی</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'article_tech_list' category='economy' %}">اقتصاد</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'article_tech_list' category='political' %}">سیاسی</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'article_tech_list' category='KidsAndteenager' %}">کودک و نوجوان</a>
                                     </li>
-                                    <li><a class="dropdown-item" href="post-large-and-grid.html">طبیعی</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'article_tech_list' category='normal' %}">طبیعی</a></li>{% endcomment %}
                                 </ul>
 
 
@@ -113,9 +132,9 @@
                                 <a class="dropdown-item dropdown-toggle" href="#">فروشگاه <span
                                         class="badge bg-danger smaller me-1">جدید</span></a>
                                 <ul class="dropdown-menu dropdown-menu-start" data-bs-popper="none">
-                                    <li><a class="dropdown-item" href="shop-grid.html">لیست محصول <span
+                                    <li><a class="dropdown-item" href="{% url 'product_list_page' %}">لیست محصول <span
                                             class="badge bg-danger smaller me-1">جدید</span></a></li>
-                                    <li><a class="dropdown-item" href="my-cart.html">سبد خرید</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'order_basket_view' %}">سبد خرید</a></li>
                                 </ul>
                             </li>
                             <li class="dropdown-submenu dropend">
@@ -137,11 +156,12 @@
                                    data-bs-auto-close="outside" data-bs-display="static" data-bs-toggle="dropdown"
                                    aria-expanded="true">
                                     {% if user.avatar %}
-                                    <img class="avatar-img rounded-circle" src="{{ user.avatar.url }}"
-                                         alt="avatar">
+                                        <img class="avatar-img rounded-circle" src="{{ user.avatar.url }}"
+                                             alt="avatar">
                                     {% else %}
-                                        <img class="avatar-img rounded-circle" src="/static/images/avatar/Defult_Profile.jpg"
-                                         alt="avatar">
+                                        <img class="avatar-img rounded-circle"
+                                             src="/static/images/avatar/Defult_Profile.jpg"
+                                             alt="avatar">
                                     {% endif %}
                                 </a>
 
@@ -150,21 +170,22 @@
                                     aria-labelledby="profileDropdown" data-bs-popper="static">
                                     <!-- Profile info -->
                                     <li class="px-3">
-                                        <div class="d-flex align-items-center">
+                                        <div id="header_avatar_2" class="d-flex align-items-center">
                                             <!-- Avatar -->
                                             {% if user.avatar %}
-                                            <div class="avatar me-3">
-                                                <img class="avatar-img rounded-circle shadow"
-                                                     src="{{ user.avatar.url }}" alt="avatar">
-                                            </div>
+                                                <div class="avatar me-3">
+                                                    <img class="avatar-img rounded-circle shadow"
+                                                         src="{{ user.avatar.url }}" alt="avatar">
+                                                </div>
                                             {% else %}
                                                 <div class="avatar me-3">
-                                                <img class="avatar-img rounded-circle shadow"
-                                                     src="/static/images/avatar/Defult_Profile.jpg" alt="avatar">
-                                            </div>
+                                                    <img class="avatar-img rounded-circle shadow"
+                                                         src="/static/images/avatar/Defult_Profile.jpg" alt="avatar">
+                                                </div>
                                             {% endif %}
                                             <div>
-                                                <a class="h6 mt-2 mt-sm-0" href="#">{{ user.first_name }}{{ user.last_name }}</a>
+                                                <a class="h6 mt-2 mt-sm-0"
+                                                   href="#">{{ user.first_name }} {{ user.last_name }}</a>
                                                 <p class="small m-0">{{ user.email }}</p>
                                             </div>
                                         </div>
@@ -183,6 +204,9 @@
                                         </li>
 
                                     {% endif %}
+                                <li><a class="dropdown-item" href="{% url 'order_basket_view' %}"><i
+                                            class="bi bi-person fa-fw me-2"></i>سبد خرید</a>
+                                    </li>
 
                                     <li><a class="dropdown-item" href="{% url 'sign_out' %}"><i
                                             class="bi bi-power fa-fw me-2"></i>خروج</a>
@@ -262,13 +286,14 @@
                     <a href="{% url 'contact_us_page' %}" class="btn btn-sm btn-danger mb-0 mx-2">تماس با ما</a>
                 </div>
                 <!-- Nav Search -->
-                <div class="nav-item position-relative ms-3">
+                <div id="count_header" class="nav-item position-relative ms-3">
                     <a class="nav-link btn btn-light btn-round mb-0" data-bs-toggle="offcanvas" href="#offcanvasMenu"
                        role="button" aria-controls="offcanvasMenu">
                         <i class="bi bi-cart3 fa-fw" data-bs-target="#offcanvasMenu"></i>
                     </a>
-                    <span class="position-absolute top-0 start-100 translate-middle badge smaller rounded-circle bg-dark mt-xl-2 ms-n1">2
-						<span class="visually-hidden">پیام خوانده نشده</span>
+                    <span class="position-absolute top-0 start-100 translate-middle badge smaller rounded-circle bg-dark mt-xl-2 ms-n1">{% if count_is_zero %}
+                        0{% else %}{{ product_count }}{% endif %}
+                        <span class="visually-hidden">پیام خوانده نشده</span>
 					</span>
                 </div>
                 <!-- Nav right END -->

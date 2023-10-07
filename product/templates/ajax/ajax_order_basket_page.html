@@ -1,0 +1,142 @@
+{% load poll_extras %}
+<div class="container">
+            <div class="row g-4 g-lg-5">
+
+                <!-- Left side START -->
+                <div class="col-lg-8">
+                    <!-- My Cart START -->
+                    <div class="card bg-transparent">
+                        <!-- Card header -->
+                        <div class="card-header border-bottom d-flex justify-content-between align-items-center px-0 pb-3">
+                            <h4 class="card-title mb-0">سفارشات</h4>
+                            <span>{{ product_count }} کالا</span>
+                        </div>
+
+                        <!-- Card body -->
+                        <div class="card-body p-0 pt-4">
+                            {% if order.orderdetail_set.all %}
+                                {% for detail in order.orderdetail_set.all %}
+                                    <div class="row">
+                                        <!-- Image -->
+                                        <div class="col-5 col-md-2">
+                                            <div class="bg-light p-2 rounded-2">
+                                                <img src="{{ detail.product.image.url }}" alt="">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-7 col-md-10">
+                                            <div class="row g-2">
+                                                <!-- Content -->
+                                                <div class="col-md-7">
+                                                    <!-- Product detail START -->
+
+                                                    <h5 class="mb-1 text-basket-product-title"><a
+                                                            href="http://127.0.0.1:8000/products/{{ detail.product.slug }}">{{ detail.product.title }}</a>
+                                                    </h5>
+                                                    <small class="text-success">{% if detail.product.inventory %}
+                                                        موجود{% else %}نا موجود{% endif %}</small>
+                                                    <!-- List -->
+
+                                                </div>
+
+                                                <!-- Select -->
+                                                <div class="col-md-2">
+                                                    <button onclick="changeOrderDetailCountInBasketPage({{ detail.id }},'increase')"
+                                                            class="size-btn btn btn-info-soft" id="increase">+
+                                                    </button>
+                                                    <span id="number">{{ detail.count }}</span>
+                                                    <button onclick="changeOrderDetailCountInBasketPage({{ detail.id }},'decrease')"
+                                                            class="size-btn btn btn-info-soft" id="decrease">-
+                                                    </button>
+                                                </div>
+
+                                                <!-- Price and button -->
+                                                <div class="col-md-3 text-md-end">
+                                                    <h5>{{ detail.product.price|three_digits_currency }} </h5>
+                                                    <!-- Buttons -->
+                                                    <div class="hstack gap-1 flex-wrap text-primary-hover mt-2 justify-content-md-end">
+                                                        <a onclick="removeOrderDetailInBasketPage({{ detail.id }})" href="#" class="text-reset small"><i
+                                                                class="bi bi-trash3 me-2"></i>حذف</a>
+                                                        <a href="#" class="text-reset small"><i
+                                                                class="bi bi-heart me-2"></i>ذخیره
+                                                            در لیست</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                {% endfor %}
+                            {% else %}
+                                <div class="alert alert-warning" role="alert">سبد خرید شما خالی است !!</div>
+
+                            {% endif %}
+
+                        </div>
+
+                        <!-- Card footer -->
+                        <div class="card-footer p-0 pt-3 text-end">
+                            <button class="btn btn-primary mb-0" disabled="">بروزرسانی سبد خرید</button>
+                        </div>
+                    </div>
+                    <!-- My Cart END -->
+                </div>
+                <!-- Left side END -->
+
+                <!-- Right Side START -->
+                <div class="col-lg-4">
+                    <!-- Coupon code START -->
+                    {% comment %}    <div class="mb-4">
+                        <h5 class="mb-2">کد تخفیف</h5>
+                        <!-- Input group -->
+                        <div class="input-group">
+                            <input class="form-control form-control" placeholder="افزودن کد">
+                            <button type="button" class="btn btn-dark">اعمال</button>
+                        </div>
+                        <small>20% کد تخفیف</small>
+                    </div>{% endcomment %}
+                    <!-- Coupon code END -->
+
+                    <!-- Order summary START -->
+                    <div class="card bg-light border border-secondary border-opacity-25 rounded-2 p-4">
+                        <!-- card header -->
+                        <div class="card-header bg-light p-0 pb-3">
+                            <h5 class="card-title mb-0">جزئیات پرداخت</h5>
+                        </div>
+
+                        <!-- Card body -->
+                        <div class="card-body p-0 pb-3">
+                            <ul class="list-group list-group-borderless">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>قیمت کالاها</span>
+                                    <span class="h6 mb-0">{{ sum|three_digits_currency }} تومان</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>هزینه ارسال</span>
+                                    <span class="h6 mb-0">10000 تومان</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>مالیات</span>
+                                    <span class="h6 mb-0">{{ tax }} تومان</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Card footer -->
+                        <div class="card-footer bg-light border-top p-0 pt-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>پرداخت</span>
+                                <span class="h5 mb-0">{{ final_price }} تومان</span>
+                            </div>
+
+                            <!-- Button -->
+                            <div class="d-grid"><a href="#" class="btn btn-primary mb-0">پرداخت</a></div>
+                        </div>
+                    </div>
+                    <!-- Order summary END -->
+                    <p class="small mb-0 text-center mt-2">با تکمیل خرید <a href="#">شرایط سایت</a> را پذیرفته اید.</p>
+                </div>
+                <!-- Right Side END -->
+
+            </div>
+        </div>

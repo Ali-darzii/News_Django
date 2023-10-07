@@ -5,10 +5,759 @@
 {% endblock %}
 {% block header_refrences %}
     <link rel="stylesheet" href="/static/css/custom.css">
-    {% comment %}<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>{% endcomment %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
-    <script src="/static/js/custom.js"></script>
+    <script>
+        const storedTheme = localStorage.getItem('theme')
 
+        const getPreferredTheme = () => {
+            if (storedTheme) {
+                return storedTheme
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const setTheme = function (theme) {
+            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+        }
+
+        setTheme(getPreferredTheme())
+
+        window.addEventListener('DOMContentLoaded', () => {
+            var el = document.querySelector('.theme-icon-active');
+            if (el != 'undefined' && el != null) {
+                const showActiveTheme = theme => {
+                    const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                    const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+
+                    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                        element.classList.remove('active')
+                    })
+
+                    btnToActive.classList.add('active')
+                    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                }
+
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (storedTheme !== 'light' || storedTheme !== 'dark') {
+                        setTheme(getPreferredTheme())
+                    }
+                })
+
+                showActiveTheme(getPreferredTheme())
+
+                document.querySelectorAll('[data-bs-theme-value]')
+                    .forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const theme = toggle.getAttribute('data-bs-theme-value')
+                            localStorage.setItem('theme', theme)
+                            setTheme(theme)
+                            showActiveTheme(theme)
+                        })
+                    })
+
+            }
+        })
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="/static/vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/apexcharts/css/apexcharts.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/quill/css/quill.snow.css">
+    <link id="style-switch" rel="stylesheet" type="text/css" href="/static/css/style-rtl.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.css">
+    <style type="text/css">.apexcharts-canvas {
+        position: relative;
+        user-select: none;
+        /* cannot give overflow: hidden as it will crop tooltips which overflow outside chart area */
+    }
+
+
+    /* scrollbar is not visible by default for legend, hence forcing the visibility */
+    .apexcharts-canvas ::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 6px;
+    }
+
+    .apexcharts-canvas ::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, .5);
+        box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+    }
+
+
+    .apexcharts-inner {
+        position: relative;
+    }
+
+    .apexcharts-text tspan {
+        font-family: inherit;
+    }
+
+    .legend-mouseover-inactive {
+        transition: 0.15s ease all;
+        opacity: 0.20;
+    }
+
+    .apexcharts-series-collapsed {
+        opacity: 0;
+    }
+
+    .apexcharts-tooltip {
+        border-radius: 5px;
+        box-shadow: 2px 2px 6px -4px #999;
+        cursor: default;
+        font-size: 14px;
+        left: 62px;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        top: 20px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        white-space: nowrap;
+        z-index: 12;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-tooltip.apexcharts-active {
+        opacity: 1;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-tooltip.apexcharts-theme-light {
+        border: 1px solid #e3e3e3;
+        background: rgba(255, 255, 255, 0.96);
+    }
+
+    .apexcharts-tooltip.apexcharts-theme-dark {
+        color: #fff;
+        background: rgba(30, 30, 30, 0.8);
+    }
+
+    .apexcharts-tooltip * {
+        font-family: inherit;
+    }
+
+
+    .apexcharts-tooltip-title {
+        padding: 6px;
+        font-size: 15px;
+        margin-bottom: 4px;
+    }
+
+    .apexcharts-tooltip.apexcharts-theme-light .apexcharts-tooltip-title {
+        background: #ECEFF1;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .apexcharts-tooltip.apexcharts-theme-dark .apexcharts-tooltip-title {
+        background: rgba(0, 0, 0, 0.7);
+        border-bottom: 1px solid #333;
+    }
+
+    .apexcharts-tooltip-text-y-value,
+    .apexcharts-tooltip-text-goals-value,
+    .apexcharts-tooltip-text-z-value {
+        display: inline-block;
+        font-weight: 600;
+        margin-left: 5px;
+    }
+
+    .apexcharts-tooltip-text-y-label:empty,
+    .apexcharts-tooltip-text-y-value:empty,
+    .apexcharts-tooltip-text-goals-label:empty,
+    .apexcharts-tooltip-text-goals-value:empty,
+    .apexcharts-tooltip-text-z-value:empty {
+        display: none;
+    }
+
+    .apexcharts-tooltip-text-y-value,
+    .apexcharts-tooltip-text-goals-value,
+    .apexcharts-tooltip-text-z-value {
+        font-weight: 600;
+    }
+
+    .apexcharts-tooltip-text-goals-label,
+    .apexcharts-tooltip-text-goals-value {
+        padding: 6px 0 5px;
+    }
+
+    .apexcharts-tooltip-goals-group,
+    .apexcharts-tooltip-text-goals-label,
+    .apexcharts-tooltip-text-goals-value {
+        display: flex;
+    }
+
+    .apexcharts-tooltip-text-goals-label:not(:empty),
+    .apexcharts-tooltip-text-goals-value:not(:empty) {
+        margin-top: -6px;
+    }
+
+    .apexcharts-tooltip-marker {
+        width: 12px;
+        height: 12px;
+        position: relative;
+        top: 0px;
+        margin-right: 10px;
+        border-radius: 50%;
+    }
+
+    .apexcharts-tooltip-series-group {
+        padding: 0 10px;
+        display: none;
+        text-align: left;
+        justify-content: left;
+        align-items: center;
+    }
+
+    .apexcharts-tooltip-series-group.apexcharts-active .apexcharts-tooltip-marker {
+        opacity: 1;
+    }
+
+    .apexcharts-tooltip-series-group.apexcharts-active,
+    .apexcharts-tooltip-series-group:last-child {
+        padding-bottom: 4px;
+    }
+
+    .apexcharts-tooltip-series-group-hidden {
+        opacity: 0;
+        height: 0;
+        line-height: 0;
+        padding: 0 !important;
+    }
+
+    .apexcharts-tooltip-y-group {
+        padding: 6px 0 5px;
+    }
+
+    .apexcharts-tooltip-box, .apexcharts-custom-tooltip {
+        padding: 4px 8px;
+    }
+
+    .apexcharts-tooltip-boxPlot {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .apexcharts-tooltip-box > div {
+        margin: 4px 0;
+    }
+
+    .apexcharts-tooltip-box span.value {
+        font-weight: bold;
+    }
+
+    .apexcharts-tooltip-rangebar {
+        padding: 5px 8px;
+    }
+
+    .apexcharts-tooltip-rangebar .category {
+        font-weight: 600;
+        color: #777;
+    }
+
+    .apexcharts-tooltip-rangebar .series-name {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .apexcharts-xaxistooltip {
+        opacity: 0;
+        padding: 9px 10px;
+        pointer-events: none;
+        color: #373d3f;
+        font-size: 13px;
+        text-align: center;
+        border-radius: 2px;
+        position: absolute;
+        z-index: 10;
+        background: #ECEFF1;
+        border: 1px solid #90A4AE;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-xaxistooltip.apexcharts-theme-dark {
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        color: #fff;
+    }
+
+    .apexcharts-xaxistooltip:after,
+    .apexcharts-xaxistooltip:before {
+        left: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .apexcharts-xaxistooltip:after {
+        border-color: rgba(236, 239, 241, 0);
+        border-width: 6px;
+        margin-left: -6px;
+    }
+
+    .apexcharts-xaxistooltip:before {
+        border-color: rgba(144, 164, 174, 0);
+        border-width: 7px;
+        margin-left: -7px;
+    }
+
+    .apexcharts-xaxistooltip-bottom:after,
+    .apexcharts-xaxistooltip-bottom:before {
+        bottom: 100%;
+    }
+
+    .apexcharts-xaxistooltip-top:after,
+    .apexcharts-xaxistooltip-top:before {
+        top: 100%;
+    }
+
+    .apexcharts-xaxistooltip-bottom:after {
+        border-bottom-color: #ECEFF1;
+    }
+
+    .apexcharts-xaxistooltip-bottom:before {
+        border-bottom-color: #90A4AE;
+    }
+
+    .apexcharts-xaxistooltip-bottom.apexcharts-theme-dark:after {
+        border-bottom-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-xaxistooltip-bottom.apexcharts-theme-dark:before {
+        border-bottom-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-xaxistooltip-top:after {
+        border-top-color: #ECEFF1
+    }
+
+    .apexcharts-xaxistooltip-top:before {
+        border-top-color: #90A4AE;
+    }
+
+    .apexcharts-xaxistooltip-top.apexcharts-theme-dark:after {
+        border-top-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-xaxistooltip-top.apexcharts-theme-dark:before {
+        border-top-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-xaxistooltip.apexcharts-active {
+        opacity: 1;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-yaxistooltip {
+        opacity: 0;
+        padding: 4px 10px;
+        pointer-events: none;
+        color: #373d3f;
+        font-size: 13px;
+        text-align: center;
+        border-radius: 2px;
+        position: absolute;
+        z-index: 10;
+        background: #ECEFF1;
+        border: 1px solid #90A4AE;
+    }
+
+    .apexcharts-yaxistooltip.apexcharts-theme-dark {
+        background: rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(0, 0, 0, 0.5);
+        color: #fff;
+    }
+
+    .apexcharts-yaxistooltip:after,
+    .apexcharts-yaxistooltip:before {
+        top: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+
+    .apexcharts-yaxistooltip:after {
+        border-color: rgba(236, 239, 241, 0);
+        border-width: 6px;
+        margin-top: -6px;
+    }
+
+    .apexcharts-yaxistooltip:before {
+        border-color: rgba(144, 164, 174, 0);
+        border-width: 7px;
+        margin-top: -7px;
+    }
+
+    .apexcharts-yaxistooltip-left:after,
+    .apexcharts-yaxistooltip-left:before {
+        left: 100%;
+    }
+
+    .apexcharts-yaxistooltip-right:after,
+    .apexcharts-yaxistooltip-right:before {
+        right: 100%;
+    }
+
+    .apexcharts-yaxistooltip-left:after {
+        border-left-color: #ECEFF1;
+    }
+
+    .apexcharts-yaxistooltip-left:before {
+        border-left-color: #90A4AE;
+    }
+
+    .apexcharts-yaxistooltip-left.apexcharts-theme-dark:after {
+        border-left-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-yaxistooltip-left.apexcharts-theme-dark:before {
+        border-left-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-yaxistooltip-right:after {
+        border-right-color: #ECEFF1;
+    }
+
+    .apexcharts-yaxistooltip-right:before {
+        border-right-color: #90A4AE;
+    }
+
+    .apexcharts-yaxistooltip-right.apexcharts-theme-dark:after {
+        border-right-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-yaxistooltip-right.apexcharts-theme-dark:before {
+        border-right-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .apexcharts-yaxistooltip.apexcharts-active {
+        opacity: 1;
+    }
+
+    .apexcharts-yaxistooltip-hidden {
+        display: none;
+    }
+
+    .apexcharts-xcrosshairs,
+    .apexcharts-ycrosshairs {
+        pointer-events: none;
+        opacity: 0;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-xcrosshairs.apexcharts-active,
+    .apexcharts-ycrosshairs.apexcharts-active {
+        opacity: 1;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-ycrosshairs-hidden {
+        opacity: 0;
+    }
+
+    .apexcharts-selection-rect {
+        cursor: move;
+    }
+
+    .svg_select_boundingRect, .svg_select_points_rot {
+        pointer-events: none;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .apexcharts-selection-rect + g .svg_select_boundingRect,
+    .apexcharts-selection-rect + g .svg_select_points_rot {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .apexcharts-selection-rect + g .svg_select_points_l,
+    .apexcharts-selection-rect + g .svg_select_points_r {
+        cursor: ew-resize;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .svg_select_points {
+        fill: #efefef;
+        stroke: #333;
+        rx: 2;
+    }
+
+    .apexcharts-svg.apexcharts-zoomable.hovering-zoom {
+        cursor: crosshair
+    }
+
+    .apexcharts-svg.apexcharts-zoomable.hovering-pan {
+        cursor: move
+    }
+
+    .apexcharts-zoom-icon,
+    .apexcharts-zoomin-icon,
+    .apexcharts-zoomout-icon,
+    .apexcharts-reset-icon,
+    .apexcharts-pan-icon,
+    .apexcharts-selection-icon,
+    .apexcharts-menu-icon,
+    .apexcharts-toolbar-custom-icon {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        line-height: 24px;
+        color: #6E8192;
+        text-align: center;
+    }
+
+    .apexcharts-zoom-icon svg,
+    .apexcharts-zoomin-icon svg,
+    .apexcharts-zoomout-icon svg,
+    .apexcharts-reset-icon svg,
+    .apexcharts-menu-icon svg {
+        fill: #6E8192;
+    }
+
+    .apexcharts-selection-icon svg {
+        fill: #444;
+        transform: scale(0.76)
+    }
+
+    .apexcharts-theme-dark .apexcharts-zoom-icon svg,
+    .apexcharts-theme-dark .apexcharts-zoomin-icon svg,
+    .apexcharts-theme-dark .apexcharts-zoomout-icon svg,
+    .apexcharts-theme-dark .apexcharts-reset-icon svg,
+    .apexcharts-theme-dark .apexcharts-pan-icon svg,
+    .apexcharts-theme-dark .apexcharts-selection-icon svg,
+    .apexcharts-theme-dark .apexcharts-menu-icon svg,
+    .apexcharts-theme-dark .apexcharts-toolbar-custom-icon svg {
+        fill: #f3f4f5;
+    }
+
+    .apexcharts-canvas .apexcharts-zoom-icon.apexcharts-selected svg,
+    .apexcharts-canvas .apexcharts-selection-icon.apexcharts-selected svg,
+    .apexcharts-canvas .apexcharts-reset-zoom-icon.apexcharts-selected svg {
+        fill: #008FFB;
+    }
+
+    .apexcharts-theme-light .apexcharts-selection-icon:not(.apexcharts-selected):hover svg,
+    .apexcharts-theme-light .apexcharts-zoom-icon:not(.apexcharts-selected):hover svg,
+    .apexcharts-theme-light .apexcharts-zoomin-icon:hover svg,
+    .apexcharts-theme-light .apexcharts-zoomout-icon:hover svg,
+    .apexcharts-theme-light .apexcharts-reset-icon:hover svg,
+    .apexcharts-theme-light .apexcharts-menu-icon:hover svg {
+        fill: #333;
+    }
+
+    .apexcharts-selection-icon,
+    .apexcharts-menu-icon {
+        position: relative;
+    }
+
+    .apexcharts-reset-icon {
+        margin-left: 5px;
+    }
+
+    .apexcharts-zoom-icon,
+    .apexcharts-reset-icon,
+    .apexcharts-menu-icon {
+        transform: scale(0.85);
+    }
+
+    .apexcharts-zoomin-icon,
+    .apexcharts-zoomout-icon {
+        transform: scale(0.7)
+    }
+
+    .apexcharts-zoomout-icon {
+        margin-right: 3px;
+    }
+
+    .apexcharts-pan-icon {
+        transform: scale(0.62);
+        position: relative;
+        left: 1px;
+        top: 0px;
+    }
+
+    .apexcharts-pan-icon svg {
+        fill: #fff;
+        stroke: #6E8192;
+        stroke-width: 2;
+    }
+
+    .apexcharts-pan-icon.apexcharts-selected svg {
+        stroke: #008FFB;
+    }
+
+    .apexcharts-pan-icon:not(.apexcharts-selected):hover svg {
+        stroke: #333;
+    }
+
+    .apexcharts-toolbar {
+        position: absolute;
+        z-index: 11;
+        max-width: 176px;
+        text-align: right;
+        border-radius: 3px;
+        padding: 0px 6px 2px 6px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .apexcharts-menu {
+        background: #fff;
+        position: absolute;
+        top: 100%;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 3px;
+        right: 10px;
+        opacity: 0;
+        min-width: 110px;
+        transition: 0.15s ease all;
+        pointer-events: none;
+    }
+
+    .apexcharts-menu.apexcharts-menu-open {
+        opacity: 1;
+        pointer-events: all;
+        transition: 0.15s ease all;
+    }
+
+    .apexcharts-menu-item {
+        padding: 6px 7px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .apexcharts-theme-light .apexcharts-menu-item:hover {
+        background: #eee;
+    }
+
+    .apexcharts-theme-dark .apexcharts-menu {
+        background: rgba(0, 0, 0, 0.7);
+        color: #fff;
+    }
+
+    @media screen and (min-width: 768px) {
+        .apexcharts-canvas:hover .apexcharts-toolbar {
+            opacity: 1;
+        }
+    }
+
+    .apexcharts-datalabel.apexcharts-element-hidden {
+        opacity: 0;
+    }
+
+    .apexcharts-pie-label,
+    .apexcharts-datalabels,
+    .apexcharts-datalabel,
+    .apexcharts-datalabel-label,
+    .apexcharts-datalabel-value {
+        cursor: default;
+        pointer-events: none;
+    }
+
+    .apexcharts-pie-label-delay {
+        opacity: 0;
+        animation-name: opaque;
+        animation-duration: 0.3s;
+        animation-fill-mode: forwards;
+        animation-timing-function: ease;
+    }
+
+    .apexcharts-canvas .apexcharts-element-hidden {
+        opacity: 0;
+    }
+
+    .apexcharts-hide .apexcharts-series-points {
+        opacity: 0;
+    }
+
+    .apexcharts-gridline,
+    .apexcharts-annotation-rect,
+    .apexcharts-tooltip .apexcharts-marker,
+    .apexcharts-area-series .apexcharts-area,
+    .apexcharts-line,
+    .apexcharts-zoom-rect,
+    .apexcharts-toolbar svg,
+    .apexcharts-area-series .apexcharts-series-markers .apexcharts-marker.no-pointer-events,
+    .apexcharts-line-series .apexcharts-series-markers .apexcharts-marker.no-pointer-events,
+    .apexcharts-radar-series path,
+    .apexcharts-radar-series polygon {
+        pointer-events: none;
+    }
+
+
+    /* markers */
+
+    .apexcharts-marker {
+        transition: 0.15s ease all;
+    }
+
+    @keyframes opaque {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+
+    /* Resize generated styles */
+
+    @keyframes resizeanim {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 0;
+        }
+    }
+
+    .resize-triggers {
+        animation: 1ms resizeanim;
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    .resize-triggers,
+    .resize-triggers > div,
+    .contract-trigger:before {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .resize-triggers > div {
+        background: #eee;
+        overflow: auto;
+    }
+
+    .contract-trigger:before {
+        width: 200%;
+        height: 200%;
+    }</style>
 {% endblock %}
 
 {% block content %}
@@ -31,43 +780,48 @@
                             <div class="card-body pt-3 pb-0">
                                 <div class="row d-flex justify-content-between">
                                     <!-- Avatar -->
-                                    {% if user.avatar %}
-                                        <div class="col-sm-12 col-md-auto text-center text-md-start">
-                                            <div class="avatar avatar-xxl mt-n5">
+
+                                    <div class="col-sm-12 col-md-auto text-center text-md-start">
+                                        <div id="head_avatar" class="avatar avatar-xxl mt-n5">
+                                            {% if user.avatar %}
                                                 <img class="avatar-img rounded-circle border border-white border-3 shadow"
                                                      src="{{ user.avatar.url }}" alt="">
-                                            </div>
-                                        </div>
-                                    {% else %}
-                                        <div class="col-sm-12 col-md-auto text-center text-md-start">
-                                            <div class="avatar avatar-xxl mt-n5">
+                                            {% else %}
                                                 <img class="avatar-img rounded-circle border border-white border-3 shadow"
                                                      src="/static/images/avatar/Defult_Profile.jpg" alt="">
-                                            </div>
+                                            {% endif %}
+
                                         </div>
-                                    {% endif %}
+                                    </div>
+
                                     <!-- Profile info -->
                                     <div class="col-sm-12 col-md text-center text-md-start d-md-flex justify-content-between align-items-center">
-                                        <div>
-                                            <h4 class="my-1">{% if user.first_name and user.last_name %}
-                                                {{ user.first_name }} {{ user.last_name }}
-                                            {% elif user.first_name %}
-                                                {{ user.first_name }}
-                                            {% elif user.last_name %}
-                                                {{ user.last_name }}
-                                            {% elif user.email %}
-                                                {{ user.email }}
-                                            {% endif %}  <i
+                                        <div id="top-info">
+                                            <h4 class="my-1">
+                                                {% if user.first_name and user.last_name %}
+                                                    {{ user.first_name }} {{ user.last_name }}
+                                                {% elif user.first_name %}
+                                                    {{ user.first_name }}
+                                                {% elif user.last_name %}
+                                                    {{ user.last_name }}
+                                                {% elif user.email %}
+                                                    {{ user.email }}
+                                                {% endif %}  <i
                                                     class="bi bi-patch-check-fill text-info small"></i></h4>
                                             <ul class="list-inline">
 
-                                                <li class="list-inline-item"><i class="bi bi-geo-alt me-1"></i>
+                                                {% if user.city %}
+                                                	<li class="list-inline-item"><i class="bi bi-geo-alt me-1"></i>
                                                     {{ user.city }}
                                                 </li>
+                                                {% endif %}
                                                 <li class=" show-jalali list-inline-item "><i
                                                         class="bi bi-calendar-date me-1"></i>
-                                                    تاریخ عضویت <bdo
-                                                            dir="ltr">{{ user.date_joined|show_jalali_date }}</bdo>
+                                                    این حساب در {{ user.date_joined|make_it_month }} {{ user.date_joined|name_of_month }} {{ user.date_joined|make_it_year }} ایجاد شده است
+                                                     {% comment %} این حساب در{{ user.date_joined|make_it_month }}
+                                                        خرداد {{ user.date_joined|make_it_year }} ایجاد شده است.{% endcomment %}
+                                                    {% comment %}تاریخ عضویت <bdo
+                                                            dir="ltr">{{ user.date_joined|show_jalali_date }}</bdo>{% endcomment %}
                                                 </li>
                                             </ul>
                                             <p class="m-0"></p>
@@ -122,10 +876,10 @@
                     <!-- Left sidebar START -->
                     <div class="col-lg-7 col-xxl-8">
                         <!-- Profile START -->
-                        <form name="origin_form" action="{% url 'user_panel' %}" method="post"
-                              enctype="multipart/form-data"> {% comment %}enctype="multipart/form-data"{% endcomment %}
+                        <form id="origin_form" name="origin_form" action="{% url 'user_panel' %}" method="post"
+                              enctype="multipart/form-data">
                             {% csrf_token %}
-                            <div class="card border mb-4">
+                            <div id="origin_ajax" class="card border mb-4">
                                 <div class="card-header border-bottom p-3">
                                     <h4 class="card-header-title mb-0">حساب کاربری</h4>
                                 </div>
@@ -155,43 +909,34 @@
                                         <!-- Avatar upload START -->
                                         <div class="d-flex align-items-center">
 
-                                            {% if user.avatar %}
-                                                <div class="position-relative me-3">
-                                                    <!-- Avatar edit -->
-                                                    <div class="position-absolute top-0 end-0  z-index-9">
-                                                        <a id="uploadButton"
-                                                           class="btn btn-sm btn-light btn-round mb-0 mt-n1 me-n1"
-                                                           href="#"> <i class="bi bi-pencil"></i></a>
-                                                        {{ origin_form.avatar }}
-                                                    </div>
-                                                    <!-- Avatar preview -->
-                                                    <div class="avatar avatar-xl">
+
+                                            <div class="position-relative me-3">
+                                                <!-- Avatar edit -->
+                                                <div class="position-absolute top-0 end-0  z-index-9">
+                                                    <a id="uploadButton"
+                                                       class="btn btn-sm btn-light btn-round mb-0 mt-n1 me-n1"
+                                                       href=""> <i class="bi bi-pencil"></i> </a>
+                                                    {{ origin_form.avatar }}
+                                                </div>
+                                                <!-- Avatar preview -->
+                                                <div id="form_avatar" class="avatar avatar-xl">
+                                                    {% if user.avatar %}
                                                         <img class="avatar-img rounded-circle border border-white border-3 shadow"
                                                              src="{{ user.avatar.url }}" alt="">
-                                                    </div>
-                                                </div>
-                                            {% else %}
-                                                <div class="position-relative me-3">
-                                                    <!-- Avatar edit -->
-                                                    <div class="position-absolute top-0 end-0  z-index-9">
-                                                        <a id="uploadButton"
-                                                           class="btn btn-sm btn-light btn-round mb-0 mt-n1 me-n1"
-                                                           href="#"> <i class="bi bi-pencil"></i> </a>
-                                                        {{ origin_form.avatar }}
-                                                    </div>
-                                                    <!-- Avatar preview -->
-                                                    <div class="avatar avatar-xl">
+                                                    {% else %}
                                                         <img class="avatar-img rounded-circle border border-white border-3 shadow"
                                                              src="/static/images/avatar/Defult_Profile.jpg" alt="">
-                                                    </div>
+                                                    {% endif %}
+
                                                 </div>
-                                            {% endif %}
+                                            </div>
 
                                             <!-- Avatar remove button -->
                                             <div class="avatar-remove">
                                                 {% if user.avatar %}
-                                                    <button name="delete_avatar" type="submit"
-                                                            class="placement-btn-1 btn btn-danger  ">حذف
+                                                    <button onclick="deleteAvatar()" name="delete_avatar" type="button"
+                                                            class="placement-btn-1 btn btn-danger btn-sm ">حذف عکس
+                                                    پروفایل
                                                 {% endif %}
 
                                                 </button>
@@ -221,241 +966,146 @@
                                         {{ origin_form.birth }}
                                     </div>
                                     <!-- Save button -->
+
+
                                     <div class="d-flex justify-content-end mt-4">
-                                        <button name="save_user_edit" type="submit" class="btn btn-primary">ذخیره
+                                        <button {% comment %}onclick="userAccountOriginFrom()"{% endcomment %}
+                                                id="save_user_edit" name="save_user_edit"
+                                                type="submit" class="btn btn-primary">ذخیره
                                         </button>
-
-
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- Profile END -->
-
-                            <!-- Personal information START -->
-                            <div class="card border mb-4">
-                                <div class="card-header border-bottom p-3">
-                                    <h4 class="card-header-title mb-0">اطلاعات شخصی</h4>
-                                </div>
-                                <div class="card-body">
-                                    <!-- Skype -->
-                                    <div class="mb-3">
-                                        <label class="form-label">شماره تلفن همراه</label>
-                                        {{ profile_form.phone }}
-                                        <div class="text-danger-emphasis">{{ profile_form.phone.errors }}</div>
-                                    </div>
-                                    <!-- Email -->
-                                    <div class="mb-3">
-                                        <label class="form-label">شماره تلفن ثابت</label>
-                                        {{ profile_form.home_phone }}
-                                        <div class="text-danger-emphasis">{{ profile_form.home_phone.errors }}</div>
-                                    </div>
-                                    <!-- Address -->
-                                    <div class="mb-3">
-                                        <label class="form-label">آدرس</label>
-                                        {{ profile_form.address }}
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label">کد پستی</label>
-                                        {{ profile_form.post_cart }}
-                                        <div class="text-danger-emphasis">{{ profile_form.post_cart.errors }}</div>
-                                    </div>
-                                    <!-- Save button -->
-                                    <div class="d-flex justify-content-end mt-4">
-                                        <button name="save_profile_edit" type="submit" class="btn btn-primary">ذخیره
-                                        </button>
-
-                                    </div>
-                                </div>
-                            </div>
                         </form>
-                        <!-- Personal information END -->
 
-                        <!-- Social links START -->
-                        <!-- Social links END -->
-
-                        <!-- Update password START -->
-                        <form action="{% url 'user_panel' %}" method="post">
-                            {% csrf_token %}
-                            <div class="card border">
-                                <div class="card-header border-bottom p-3">
-                                    <h4 class="card-header-title mb-0">تغییر رمز عبور</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="mb-3">
-                                        <label for="currentpassword" class="form-label">رمز عبور فعلی</label>
-                                        {{ password_form.current_password }}
-                                        <div class="text-danger-emphasis">{{ password_form.current_password.errors }}</div>
-                                    </div>
-                                    <!-- New password -->
-                                    <div class="mb-3">
-                                        <label for="pass_show" class="form-label" id="psw-strength-message">رمز عبور
-                                            جدید</label>
-                                        <div class="input-group">
-                                            {{ password_form.password }}
-
-                                            <span class="input-group-text p-0"><a href="" id="togglelink"><i
-                                                    class="fakepasswordicon far fa-eye cursor-pointer p-2 w-40px"></i></a></span>
-
-                                        </div>
-                                        <div class="rounded mt-1" id="psw-strength"></div>
-                                        <div class="text-danger-emphasis">{{ password_form.password.errors }}</div>
-                                    </div>
-                                    <!-- New password -->
-                                    <div>
-                                        <label for="confirmpassword" class="form-label">تکرار رمز عبور جدید</label>
-                                        {{ password_form.confirm_password }}
-                                        <div class="text-danger-emphasis">{{ password_form.confirm_password.errors }}</div>
-                                    </div>
-                                    <div class="d-flex justify-content-end mt-4">
-                                        <button name="change_password" type="submit" class="btn btn-primary">ذخیره
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
                     </div>
-                    </form>
-
-                    <!-- Left sidebar END -->
-
-                    <!-- Right sidebar START -->
-                    <div class="col-lg-5 col-xxl-4">
-                        <!-- Profile Setting START -->
-                        <div class="card border mb-4">
+                    <form id="profile-form" action="{% url 'user_panel' %}" method="post">
+                        <!-- Profile END -->
+                        {% csrf_token %}
+                        <!-- Personal information START -->
+                        <div id="profile_ajax" class="card border mb-4">
                             <div class="card-header border-bottom p-3">
-                                <h4 class="card-header-title mb-0">تنظیمات حساب کاربری</h4>
+                                <h4 class="card-header-title mb-0">اطلاعات شخصی</h4>
                             </div>
                             <div class="card-body">
-                                <div class="form-check form-switch form-check-md mb-3">
-                                    <input class="form-check-input" type="checkbox" id="availabilityCheck" checked="">
-                                    <label class="form-check-label" for="availabilityCheck">نمایش پروفایل برای
-                                        همه</label>
+                                <!-- Skype -->
+                                <div class="mb-3">
+                                    <label class="form-label">شماره تلفن همراه</label>
+                                    {{ profile_form.phone }}
+                                    <div class="text-danger-emphasis">{{ profile_form.phone.errors }}</div>
                                 </div>
-                                <div class="form-check form-switch form-check-md mb-3">
-                                    <input class="form-check-input" type="checkbox" id="proCheck" disabled="">
-                                    <label class="form-check-label" for="proCheck">غیرفعالسازی تبلیغات <span
-                                            class="badge bg-primary align-middle">حرفه ای</span></label>
+                                <!-- Email -->
+                                <div class="mb-3">
+                                    <label class="form-label">شماره تلفن ثابت</label>
+                                    {{ profile_form.home_phone }}
+                                    <div class="text-danger-emphasis">{{ profile_form.home_phone.errors }}</div>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Profile Setting END -->
-
-                        <!-- Notifications START -->
-                        <div class="card border mb-4">
-                            <div class="card-header border-bottom p-3">
-                                <h4 class="card-header-title mb-0">مدیریت اعلان ها</h4>
-                            </div>
-                            <!-- Card body START -->
-                            <div class="card-body">
-                                <p>نوتیف هایی که مایل به دریافت آن هستید را فعال کرده و مابقی را غیرفعال نمایید.</p>
-                                <div class="form-check form-switch form-check-md mb-3">
-                                    <input class="form-check-input" type="checkbox" id="withdrawalCheck" checked="">
-                                    <label class="form-check-label" for="withdrawalCheck">برداشت وجه</label>
+                                <!-- Address -->
+                                <div class="mb-3">
+                                    <label class="form-label">آدرس</label>
+                                    {{ profile_form.address }}
                                 </div>
-                                <div class="form-check form-switch form-check-md mb-3">
-                                    <input class="form-check-input" type="checkbox" id="weeklyCheck">
-                                    <label class="form-check-label" for="weeklyCheck">گزارش هفتگی</label>
+                                <div class="mb-3">
+                                    <label class="form-label">کد پستی</label>
+                                    {{ profile_form.post_cart }}
+                                    <div class="text-danger-emphasis">{{ profile_form.post_cart.errors }}</div>
                                 </div>
-                                <div class="form-check form-switch form-check-md mb-3">
-                                    <input class="form-check-input" type="checkbox" id="passwordCheck" checked="">
-                                    <label class="form-check-label" for="passwordCheck">تغییر رمز عبور</label>
-                                </div>
-                                <div class="form-check form-switch form-check-md mb-3">
-                                    <input class="form-check-input" type="checkbox" id="dataCheck">
-                                    <label class="form-check-label" for="dataCheck">هشدار مصرف داده</label>
-                                </div>
-                            </div>
-                            <!-- Card body END -->
-                        </div>
-                        <!-- Notifications START -->
-
-                        <!-- Deactivate account START -->
-                        <form action="{% url 'user_panel' %}" method="post">
-                            {% csrf_token %}
-                            <div class="card border mb-4">
-                                <div class="card-header border-bottom p-3">
-                                    <h4 class="card-header-title mb-0">حذف حساب کاربری</h4>
-                                </div>
-                                <div class="card-body">
-                                    <h6>قبل از حذف به نکات زیر دقت نمایید...</h6>
-                                    <ul>
-                                        <li>با حذف حساب کاربری خود هیچ راهی برای بازیابی آن وجود نخواهد داشت.</li>
-                                        <li>با حذف حساب کاربری خود در صورت وجود سابقه خرید محصول برخی از اطلاعات شما پاک
-                                            نمیشود
-                                        </li>
-                                    </ul>
-                                    <div class="form-check form-check-md my-3">
-                                        <label class="form-check-label" for="deleteaccountCheck">بله، می خواهم حساب خود
-                                            را
-                                            حذف کنم.</label>
-                                        {{ delete_form.delete_check }}
-                                        <div class="text-danger-emphasis">{{ delete_form.delete_check.errors }}</div>
-
-                                    </div>
-                                    <button name="deleteacount1" type="submit" class="btn btn-sm btn-danger mb-0 me-2">
-                                        حذف
+                                <!-- Save button -->
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button name="save_profile_edit" type="submit" class="btn btn-primary">ذخیره
                                     </button>
 
                                 </div>
                             </div>
-                        </form>
-                        <!-- Deactivate account START -->
-                        <p><i class="bi bi-info-circle me-2"></i>این حساب در 14 خرداد 1400 ایجاد شده است.</p>
-
-                        <div class="card bg-transparent border rounded-3 mt-4">
-                            <!-- Card header -->
-                            <div class="card-header bg-transparent border-bottom p-3">
-                                <h4 class="card-header-title mb-0">حساب های فعال</h4>
-                            </div>
-                            <!-- Card body START -->
-                            <div class="card-body">
-                                <!-- Google -->
-                                <div class="position-relative mb-3 mt-3 d-sm-flex bg-success bg-opacity-10 border border-success p-3 rounded">
-                                    <!-- Title and content -->
-                                    <h2 class="fs-1 mb-0 me-3"><i class="fab fa-google text-google-icon"></i></h2>
-                                    <div>
-                                        <div class="position-absolute top-0 start-100 translate-middle bg-white rounded-circle lh-1 h-20px">
-                                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
-                                        </div>
-                                        <h6 class="mb-1">Google</h6>
-                                        <p class="mb-1 small">شما با موفقیت به حساب Google خود وصل شده اید.</p>
-                                        <!-- Button -->
-                                        <button type="button" class="btn btn-sm btn-danger mb-0 me-2">خروج</button>
-                                        <a href="#" class="btn btn-sm btn-link text-body mb-0">کسب اطلاعات</a>
-                                    </div>
-                                </div>
-
-                                <!-- Blogger -->
-                                <div class="mb-3 d-sm-flex border p-3 rounded">
-                                    <!-- Title and content -->
-                                    <h2 class="fs-1 mb-0 me-3"><i class="fab fa-blogger text-warning"></i></h2>
-                                    <div>
-                                        <h6 class="mb-1">Blogger</h6>
-                                        <p class="mb-1 small">شما با موفقیت به حساب Blogger خود وصل شده اید.</p>
-                                        <!-- Button -->
-                                        <button type="button" class="btn btn-sm btn-primary mb-0 me-2">ورود</button>
-                                        <a href="#" class="btn btn-sm btn-link text-body mb-0">کسب اطلاعات</a>
-                                    </div>
-                                </div>
-
-                                <!-- Facebook -->
-                                <div class="d-sm-flex border p-3 rounded mb-2">
-                                    <!-- Title and content -->
-                                    <h2 class="fs-1 mb-0 me-3"><i class="fab fa-facebook text-facebook"></i></h2>
-                                    <div>
-                                        <h6 class="mb-1">Facebook</h6>
-                                        <p class="mb-1 small">شما با موفقیت به حساب Facebook خود وصل شده اید.</p>
-                                        <!-- Button -->
-                                        <button type="button" class="btn btn-sm btn-primary mb-0 me-2">ورود</button>
-                                        <a href="#" class="btn btn-sm btn-link text-body mb-0">کسب اطلاعات </a>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Card body END -->
                         </div>
-                    </div>
+                    </form>
+
+
+                    <!-- Update password START -->
+                    <form id="password-form" action="{% url 'user_panel' %}" method="post">
+                        {% csrf_token %}
+                        <div id="password-ajax" class="card border">
+                            <div class="card-header border-bottom p-3">
+                                <h4 class="card-header-title mb-0">تغییر رمز عبور</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="currentpassword" class="form-label">رمز عبور فعلی</label>
+                                    {{ password_form.current_password }}
+                                    <div class="text-danger-emphasis">{{ password_form.current_password.errors }}</div>
+                                </div>
+                                <!-- New password -->
+                                <div class="mb-3">
+                                    <label for="pass_show" class="form-label" id="psw-strength-message">رمز عبور
+                                        جدید</label>
+                                    <div class="input-group">
+                                        {{ password_form.password }}
+
+                                        <span class="input-group-text p-0"><a href="" id="togglelink"><i
+                                                class="fakepasswordicon far fa-eye cursor-pointer p-2 w-40px"></i></a></span>
+
+                                    </div>
+                                    <div class="rounded mt-1" id="psw-strength"></div>
+                                    <div class="text-danger-emphasis">{{ password_form.password.errors }}</div>
+                                </div>
+                                <!-- New password -->
+                                <div>
+                                    <label for="confirmpassword" class="form-label">تکرار رمز عبور جدید</label>
+                                    {{ password_form.confirm_password }}
+                                    <div class="text-danger-emphasis">{{ password_form.confirm_password.errors }}</div>
+                                </div>
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button name="change_password" class="btn btn-primary" type="submit">ذخیره
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                </div>
+                </form>
+
+
+                <!-- Left sidebar END -->
+
+                <!-- Right sidebar START -->
+                <div class="col-lg-5 col-xxl-4">
+
+                    <!-- Deactivate account START -->
+                    <form id="delete-account-form" action="{% url 'user_panel' %}" method="post">
+                        {% csrf_token %}
+                        <div class="card border mb-4">
+                            <div class="card-header border-bottom p-3">
+                                <h4 class="card-header-title mb-0">حذف حساب کاربری</h4>
+                            </div>
+                            <div id="remove-account-ajax" class="card-body">
+                                <h6>قبل از حذف به نکات زیر دقت نمایید...</h6>
+                                <ul>
+                                    <li>با حذف حساب کاربری خود هیچ راهی برای بازیابی آن وجود نخواهد داشت.</li>
+                                    <li>با حذف حساب کاربری خود در صورت وجود سابقه خرید محصول برخی از اطلاعات شما پاک
+                                        نمیشود
+                                    </li>
+                                </ul>
+                                <div class="form-check form-check-md my-3">
+                                    <label class="form-check-label" for="deleteaccountCheck">بله، می خواهم حساب خود
+                                        را
+                                        حذف کنم.</label>
+                                    {{ delete_form.box}}
+                                    <div class="text-danger-emphasis">{{ delete_form.box.errors }}</div>
+
+                                </div>
+                                <button onclick="DeleteAccount()" name="deleteacount1" type="button" class="btn btn-sm btn-danger mb-0 me-2">
+                                    حذف
+                                </button>
+
+                            </div>
+                        </div>
+                    </form>
+                    <!-- Deactivate account START -->
+
+
                 </div>
             </div>
+
         </section>
         <!-- =======================
         Main contain END -->
@@ -463,5 +1113,10 @@
     </main>
 {% endblock %}
 {% block footer_refrences %}
-
+    <script src="/static/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/apexcharts/js/apexcharts.min.js"></script>
+    <script src="/static/vendor/quill/js/quill.min.js"></script>
+    <script src="/static/js/functions.js"></script>
+    <script src="/static/vendor/cookie_js/js.cookie.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.7.27/sweetalert2.min.js"></script>
 {% endblock %}

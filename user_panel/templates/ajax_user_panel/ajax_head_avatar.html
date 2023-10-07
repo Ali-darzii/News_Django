@@ -1,0 +1,7 @@
+{% if user.avatar %}
+    <img class="avatar-img rounded-circle border border-white border-3 shadow"
+         src="{{ user.avatar.url }}" alt="">
+{% else %}
+    <img class="avatar-img rounded-circle border border-white border-3 shadow"
+         src="/static/images/avatar/Defult_Profile.jpg" alt="">
+{% endif %}

@@ -23,7 +23,6 @@
 }
 
 
-
 #imageInput {
     display: none;
 }
@@ -33,7 +32,190 @@
     max-height: 300px;
     margin-top: 20px;
 }
+
 #deleteButton {
-            display: none;
-            margin-top: 10px;
-        }
+    display: none;
+    margin-top: 10px;
+}
+
+/*productloader*/
+#ajaxLoader {
+    width: 48px;
+    height: 48px;
+    border: 10px solid #FFF;
+    border-radius: 50%;
+    position: relative;
+    transform: rotate(45deg);
+    box-sizing: border-box;
+}
+
+#ajaxLoader::before {
+    content: "";
+    position: absolute;
+    box-sizing: border-box;
+    inset: -10px;
+    border-radius: 50%;
+    border: 10px solid #2163e8;
+    animation: prixClipFix 2s infinite linear;
+}
+
+@keyframes prixClipFix {
+    0% {
+        clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0)
+    }
+    25% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0)
+    }
+    50% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%)
+    }
+    75% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%)
+    }
+    100% {
+        clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0)
+    }
+}
+
+.center-div {
+    /*margin-left: 9%;*/
+    margin-right: 0.2rem;
+    margin-top: 10%;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.inventory_false {
+    color: #B02A37FF;
+}
+
+.star-place {
+    position: absolute;
+    left: 18%;
+
+}
+
+
+.rate {
+    float: left;
+    height: 46px;
+    padding: 0 10px;
+}
+
+.rate:not(:checked) > input {
+    display: none;
+    /*position:absolute;*/
+    top: -9999px;
+}
+
+.rate:not(:checked) > label {
+    float: right;
+    width: 1em;
+    overflow: hidden;
+    white-space: nowrap;
+    cursor: pointer;
+    font-size: 30px;
+    color: #ccc;
+}
+
+.rate:not(:checked) > label:before {
+    content: '★ ';
+}
+
+.rate > input:checked ~ label {
+    color: #ffc700;
+}
+
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
+    color: #deb217;
+}
+
+.rate > input:checked + label:hover,
+.rate > input:checked + label:hover ~ label,
+.rate > input:checked ~ label:hover,
+.rate > input:checked ~ label:hover ~ label,
+.rate > label:hover ~ input:checked ~ label {
+    color: #c59b08;
+}
+
+/*help-text-detail{*/
+/*    margin-left: ;*/
+/*}*/
+
+.spandly {
+    margin-right: 10px;
+}
+
+.self-thumbs-up {
+    cursor: pointer;
+    /*width: 26px;*/
+    margin-right: 10px;
+}
+
+.self-thumbs-down {
+    cursor: pointer;
+    /*width: 26px;*/
+    margin-right: 10px;
+}
+
+.like-btn {
+    display: none !important;
+}
+
+.text-basket-product-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.basket-product-title {
+    word-wrap: normal;
+}
+
+.size-btn {
+    width: 10px !important;
+
+
+}
+
+.flost-s {
+    margin-right: 73%;
+    position: absolute;
+}
+
+.header-basket {
+    margin-top: 5px !important;
+}
+
+.edit-btn {
+    position: absolute !important;
+}
+
+#profile-image {
+    display: block !important;
+}
+
+.npmw {
+    position: relative !important;
+}
+
+.btn-load-more {
+    position: relative;
+    left: -44.5%;
+    margin-bottom: 10px !important;
+    /*left: -45.5%;*/
+    /*!*top: -50%;*!*/
+    /*transform: translate(-1%, -20.5%);*/
+}
+.spinner-adjust{
+    /*position: relative;*/
+    /*width: 40px !important;*/
+    /*bottom: 12rem;*/
+    /*right: 10.9rem;*/
+}
+.bigger-font{
+    font-size: 21px !important;
+}

@@ -1,0 +1,25 @@
+{% for  for_product_category in  for_product_categories %}
+    <div class="form-check">
+        <input onclick="filterProduct()" autocomplete="off" class="form-check-input filter-btn" type="checkbox" data-filter="category" value="{{ for_product_category.id }}" id="{{ for_product_category.urls_title }}{{ for_product_category.id }}">
+        <label class="form-check-label" for="{{ for_product_category.urls_title }}{{ for_product_category.id }}">{{ for_product_category.title }}</label>
+    </div>
+{% endfor %}
+
+
+<div class="multi-collapse collapse" id="amenitiesCollapes1">
+    {% for  rest_product_category in rest_product_categories  %}
+        <div class="form-check">
+            <input onclick="filterProduct()" autocomplete="off" class="form-check-input filter-btn" type="checkbox" data-filter="category" value="{{ rest_product_category.id }}" id="{{rest_product_category.urls_title}}{{ rest_product_category.id }}">
+            <label class="form-check-label" for="{{rest_product_category.urls_title}}{{ rest_product_category.id }}">{{ rest_product_category.title }}</label>
+        </div>
+    {% endfor %}
+
+</div>
+<!-- Collapse button -->
+<a class="p-0 mb-0 mt-2 btn-more d-flex align-items-center collapsed"
+   data-bs-toggle="collapse" href="#amenitiesCollapes1" role="button"
+   aria-expanded="false" aria-controls="amenitiesCollapes1">
+    مشاهده <span class="see-more ms-1">بیشتر</span><span
+        class="see-less ms-1">کمتر</span><i
+        class="fas fa-angle-down ms-2"></i>
+</a>

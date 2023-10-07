@@ -1,0 +1,101 @@
+{% load poll_extras %}
+{% load poll_extras %}
+
+
+{% if not product_not_found %}
+    {% for product in products_page %}
+        <div id="GooGooli" class="col-sm-6 col-md-4">
+            <div class="card border p-3 h-100 product-box">
+                <div class="position-relative">
+                    <!-- Image -->
+                    <a href="{{ product.get_absolute_url }}" class="position-relative z-index-9">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="">
+                        {% else %}
+                            <img class="card-img" src="/images/shop/image404.png" alt="">
+                        {% endif %}
+                    </a>
+                    <!-- Card body -->
+                    <div class="card-body text-center p-3 px-0">
+                        <!-- Badge and price -->
+                        <div class="d-flex justify-content-center mb-2">
+                            <ul class="list-inline mb-0">
+                                {% if product.half_star_average %}
+                                    <li class="list-inline-item me-1">
+                                    <i class="fas fa-star-half-alt text-warning"></i>
+                                {% endif %}
+                                {% for i in product.int_star_average %}
+                                    <li class="list-inline-item me-0"><i
+                                            class="fas fa-star text-warning"></i></li>
+                                {% endfor %}
+
+                            </ul>
+                        </div>
+                        <!-- Title -->
+                        <h5 class="card-title"><a href="{{ product.get_absolute_url }}">{{ product.title }}</a></h5>
+                        {% if product.inventory %}
+
+                            <h6 class="mb-0 text-success">{{ product.price|three_digits_currency }}</h6>
+                        {% else %}
+                            <h6 class="mb-0 text-danger-emphasis">کالا موجود نمی باشد</h6>
+
+                        {% endif %}
+                    </div>
+
+                    <!-- Card footer -->
+                    <div class="card-footer text-center p-0">
+                        <!-- Button -->
+                        <a onclick="add_product_to_order({{ product.id }},'false')" href="#"
+                           class="btn btn-sm btn-primary-soft mb-0"><i class="bi bi-cart me-2"></i>افزودن به
+                            سبد</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    <div id="spinner" class="like-btn spinner-adjust">
+        <button class="btn btn-primary d-md-block btn-load-more" type="button">
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span>
+            ...Loading
+        </button>
+    </div>
+    <div class="col-12" id="page_ul">
+        <nav class="d-flex justify-content-center" aria-label="navigation">
+            <!-- Pagination 1 2 3  -->
+            <ul
+                    class="pagination pagination-bordered justify-content-center d-inline-block d-lg-flex">
+                {% if products_page.has_previous %}
+                    <li class="page-item cursor-pointer">
+                        <a class="page-link cursor-pointer"
+                           onclick="fillPage({{ products_page.previous_page_number }})">قبلی</a>
+                    </li>
+                {% endif %}
+
+                {% for pagenumber  in page_range %}
+                    <li class="page-item cursor-pointer filter-btn{% if products_page.number == pagenumber %} active{% endif %} ">
+                        <a class="page-link cursor-pointer"
+                           onclick="fillPage({{ pagenumber }})">{{ pagenumber }}</a>
+                    </li>
+                {% endfor %}
+
+
+                {% if products_page.has_next %}
+                    <li class="page-item cursor-pointer ">
+                        <a class="page-link cursor-pointer"
+                           onclick="fillPage({{ products_page.next_page_number }})">بعدی</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% else %}
+    <div id="spinner" class="like-btn spinner-adjust">
+        <button class="btn btn-primary d-md-block btn-load-more" type="button">
+                                    <span class="spinner-border spinner-border-sm" role="status"
+                                          aria-hidden="true"></span>
+            ...Loading
+        </button>
+    </div>
+    <div class="alert alert-danger">هیچ محصولی یافت نشد !!</div>
+{% endif %}

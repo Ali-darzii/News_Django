@@ -1,0 +1,20 @@
+<div id="" class="d-flex align-items-center">
+    <!-- Avatar -->
+    {% if user.avatar %}
+        <div class="avatar me-3">
+            <img class="avatar-img rounded-circle shadow"
+                 src="{{ user.avatar.url }}" alt="avatar">
+        </div>
+    {% else %}
+        <div class="avatar me-3">
+            <img class="avatar-img rounded-circle shadow"
+                 src="/static/images/avatar/Defult_Profile.jpg" alt="avatar">
+        </div>
+    {% endif %}
+    <div>
+        <a class="h6 mt-2 mt-sm-0"
+           href="#">{{ user.first_name }} {{ user.last_name }}</a>
+        <p class="small m-0">{{ user.email }}</p>
+    </div>
+</div>
+<hr>

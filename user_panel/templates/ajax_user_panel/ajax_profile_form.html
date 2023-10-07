@@ -1,0 +1,33 @@
+<div class="card-header border-bottom p-3">
+    <h4 class="card-header-title mb-0">اطلاعات شخصی</h4>
+</div>
+<div class="card-body">
+    <!-- Skype -->
+    <div class="mb-3">
+        <label class="form-label">شماره تلفن همراه</label>
+        {{ profile_form.phone }}
+        <div class="text-danger-emphasis">{{ profile_form.phone.errors }}</div>
+    </div>
+    <!-- Email -->
+    <div class="mb-3">
+        <label class="form-label">شماره تلفن ثابت</label>
+        {{ profile_form.home_phone }}
+        <div class="text-danger-emphasis">{{ profile_form.home_phone.errors }}</div>
+    </div>
+    <!-- Address -->
+    <div class="mb-3">
+        <label class="form-label">آدرس</label>
+        {{ profile_form.address }}
+    </div>
+    <div class="mb-3">
+        <label class="form-label">کد پستی</label>
+        {{ profile_form.post_cart }}
+        <div class="text-danger-emphasis">{{ profile_form.post_cart.errors }}</div>
+    </div>
+    <!-- Save button -->
+    <div class="d-flex justify-content-end mt-4">
+        <button name="save_profile_edit" type="submit" class="btn btn-primary">ذخیره
+        </button>
+
+    </div>
+</div>

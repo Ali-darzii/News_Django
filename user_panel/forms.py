@@ -177,7 +177,8 @@ class PanelChangePassword(forms.Form):
 
 
 class DeleteAccountForm(forms.Form):
-    delete_check = forms.BooleanField(required=False,widget=forms.CheckboxInput(attrs={
+    box = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
         'class': 'form-check-input',
         'id': 'deleteaccountCheck',
+        'autocomplete': 'off'
     }))

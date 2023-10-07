@@ -1,0 +1,288 @@
+{% load poll_extras %}
+
+            <div class="container">
+                <!-- Title -->
+                <div class="mb-2">
+                    <h2 class="mb-0">امتیاز و دیدگاه ها</h2>
+                </div>
+
+                <div class="row g-4 justify-content-between">
+                    <!-- Rating START -->
+                    <div class="col-md-4">
+                        <div class="bg-primary p-4 rounded-2 mb-4">
+                            <div class="text-center text-white">
+                                <!-- Info -->
+                                <h2 class="mb-0 text-white">5 / {{ comments_avg }}</h2>
+                                <p class="mb-2">{{ comments_count }} دیدگاه</p>
+                                <!-- Star -->
+                                <ul class="list-inline mb-0">
+                                    {% if half_star %}
+                                        <li class="list-inline-item me-0">
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    {% endif %}
+                                    {% for i in comments_int %}
+                                        <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    {% endfor %}
+
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 align-items-center">
+                            <div class="col-12">
+                                <h6 class="mb-0">امتیاز کلی</h6>
+                            </div>
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <!-- Progress item -->
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_5 }}%"
+                                         aria-valuenow="95" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_5 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <!-- Progress item -->
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_4 }}%"
+                                         aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_4 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+
+                            <div class="col-9 col-sm-10">
+                                <!-- Progress item -->
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_3 }}%"
+                                         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_3 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <!-- Progress item -->
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_2 }}%"
+                                         aria-valuenow="35" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_2 }}%</span>
+                            </div>
+
+                            <!-- Progress bar and Rating -->
+                            <div class="col-9 col-sm-10">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item me-0"><i class="fas fa-star text-warning"></i></li>
+                                </ul>
+                                <!-- Progress item -->
+                                <div class="progress progress-sm bg-warning bg-opacity-15">
+                                    <div class="progress-bar bg-warning" role="progressbar" style="width: {{ star_1 }}%"
+                                         aria-valuenow="20" aria-valuemin="0" aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Percentage -->
+                            <div class="col-3 col-sm-2">
+                                <span class="ms-auto h6 fw-light mb-0">{{ star_1 }}%</span>
+                            </div>
+                        </div> <!-- Row END -->
+
+                    </div>
+                    <!-- Rating END -->
+
+                    <!-- Review START -->
+                    <div id="like-dislike-ajax" class="col-md-7">
+                        <!-- Title and Select -->
+
+
+                        <hr class="my-4"> <!-- Divider -->
+
+                        <!-- Review item -->
+                        {% for comment in comments %}
+                            <div class="d-flex">
+                                {% if comment.user.avatar %}
+                                    <img class="avatar avatar-md rounded-circle float-start me-3"
+                                         src="{{ comment.user.avatar.url }}" alt="avatar">
+                                {% else %}
+                                    <img class="avatar avatar-md rounded-circle float-start me-3"
+                                         src="/static/images/avatar/Defult_Profile.jpg" alt="avatar">
+                                {% endif %}
+
+                                <div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <div>
+                                            {% if comment.user %}
+                                                <h5 class="m-0">{{ comment.user }}</h5>
+                                            {% else %}
+                                                <h5 class="m-0">{{ comment.user.email }}</h5>
+                                            {% endif %}
+
+                                            <span class="me-3 small">{{ comment.create_date | show_jalali_date }} </span>
+                                        </div>
+                                        <!-- Rating Star -->
+                                        <ul class="list-inline star-place">
+                                            {% for i in comment.star|make_it_range %}
+
+                                                <li class="list-inline-item small me-0"><i
+                                                        class="fas fa-star text-warning"></i>
+                                                </li>
+                                            {% endfor %}
+
+                                        </ul>
+                                    </div>
+                                    <p>{{ comment.comment }}</p>
+
+
+                                    <div class=" ms-md-2" role="group"
+                                         aria-label="Basic radio toggle button group">
+                                        <span>ایا این دیدگاه مفید بود؟</span>
+                                        <!-- Yes button -->
+
+                                        {% if user in comment.likes.users.all %}
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1">
+                                            <span class="spandly">{{ comment.get_total_likes }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','like')" for="btnradio1">
+                                                <img
+                                                        class="self-thumbs-up"
+                                                        src="/static/images/liked_disliked/blue_liked_face_book.png" alt="">
+                                            </label>
+
+                                        {% else %}
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio1">
+                                            <span class="spandly">{{ comment.get_total_likes }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','like')" for="btnradio1">
+                                                <img
+                                                        class="self-thumbs-up"
+                                                        src="/static/images/liked_disliked/Gray_face_book_like.png" alt="">
+                                            </label>
+
+
+                                        {% endif %}
+                                        {% if user in comment.dis_likes.users.all %}
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+                                            <span class="spandly">{{ comment.get_total_dis_like }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','dislike')"
+                                                   for="btnradio2">
+                                                <img class="self-thumbs-down"
+                                                     src="/static/images/liked_disliked/red_dislike_face_book.png"
+                                                     alt="">
+                                            </label>
+                                        {% else %}
+                                            <input type="radio" class="btn-check" name="btnradio" id="btnradio2">
+                                            <span class="spandly">{{ comment.get_total_dis_like }}</span>
+                                            <label onclick="likeComment('{{ comment.id }}','dislike')"
+                                                   for="btnradio2">
+                                                <img class="self-thumbs-down"
+                                                     src="/static/images/liked_disliked/gray_dislike_face_book.png"
+                                                     alt="">
+                                            </label>
+
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4"> <!-- Divider -->
+                        {% endfor %}
+
+
+
+                        <!-- button -->
+                        {% if user.is_authenticated %}
+                            <div class="mt-4 text-end">
+                                <a class="btn btn-primary-soft mb-0" data-bs-toggle="collapse" href="#collapseExample"
+                                   role="button" aria-expanded="false" aria-controls="collapseExample">
+                                    ثبت دیدگاه
+                                </a>
+                            </div>
+                        {% else %}
+                            <div class="mt-4 text-end">
+                                <a class="btn btn-primary-soft mb-0" href="{% url 'sign_in' %}"
+                                   aria-expanded="false" aria-controls="collapseExample">
+                                    ثبت دیدگاه
+                                </a>
+                            </div>
+                        {% endif %}
+
+                        <!-- Collapse body -->
+                        <div class="collapse" id="collapseExample">
+                            <div class="card card-body">
+
+                                {% comment %}<select class="form-select mb-3" aria-label="Default select example">
+                                    <option value="1">★★★★★ (5/5)</option>
+                                    <option value="2">★★★★☆ (4/5)</option>
+                                    <option value="3">★★★☆☆ (3/5)</option>
+                                    <option value="3">★★☆☆☆ (2/5)</option>
+                                    <option value="3">★☆☆☆☆ (1/5)</option>
+                                </select>{% endcomment %}
+                                <div class="rate">
+                                    <input onclick="starChanger('5')" type="radio" id="star5" name="rate" value="5"/>
+                                    <label onclick="starChanger('5')" for="star5" title="text">5 stars</label>
+                                    <input onclick="starChanger('4')" type="radio" id="star4" name="rate" value="4"/>
+                                    <label onclick="starChanger('4')" for="star4" title="text">4 stars</label>
+                                    <input onclick="starChanger('3')" type="radio" id="star3" name="rate" value="3"/>
+                                    <label onclick="starChanger('3')" for="star3" title="text">3 stars</label>
+                                    <input onclick="starChanger('2')" type="radio" id="star2" name="rate" value="2"/>
+                                    <label onclick="starChanger('2')" for="star2" title="text">2 stars</label>
+                                    <input onclick="starChanger('1')" type="radio" id="star1" name="rate" value="1"/>
+                                    <label onclick="starChanger('1')" for="star1" title="text">1 star</label>
+                                </div>
+                                <input type="hidden" value="5" id="starHolder">
+                                <!-- Text area -->
+                                <textarea class="form-control mb-3" id="TextAreaComment"
+                                          placeholder="Your review" rows="3"></textarea>
+                                <p class="text-danger-emphasis" id="low_char">دیدگاه شما باید بیشتر از 13 حرف باشد</p>
+                                <!-- Button -->
+                                <button onclick="commentSubmit()" type="submit" class="btn btn-primary mb-0">ثبت نظر <i
+                                        class="bi fa-fw bi-arrow-right ms-2"></i></button>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- Review END -->
+                </div>
+            </div>

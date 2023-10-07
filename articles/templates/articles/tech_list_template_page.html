@@ -1,0 +1,183 @@
+{% extends 'shared/_layout.html' %}
+{% block title %}
+    مقالات تکنولوژی | بلا گیز
+{% endblock %}
+{% block header_refrences %}
+    <!-- Dark mode -->
+    <script>
+        const storedTheme = localStorage.getItem('theme')
+
+        const getPreferredTheme = () => {
+            if (storedTheme) {
+                return storedTheme
+            }
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        }
+
+        const setTheme = function (theme) {
+            if (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark')
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', theme)
+            }
+        }
+
+        setTheme(getPreferredTheme())
+
+        window.addEventListener('DOMContentLoaded', () => {
+            var el = document.querySelector('.theme-icon-active');
+            if (el != 'undefined' && el != null) {
+                const showActiveTheme = theme => {
+                    const activeThemeIcon = document.querySelector('.theme-icon-active use')
+                    const btnToActive = document.querySelector(`[data-bs-theme-value="${theme}"]`)
+                    const svgOfActiveBtn = btnToActive.querySelector('.mode-switch use').getAttribute('href')
+
+                    document.querySelectorAll('[data-bs-theme-value]').forEach(element => {
+                        element.classList.remove('active')
+                    })
+
+                    btnToActive.classList.add('active')
+                    activeThemeIcon.setAttribute('href', svgOfActiveBtn)
+                }
+
+                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                    if (storedTheme !== 'light' || storedTheme !== 'dark') {
+                        setTheme(getPreferredTheme())
+                    }
+                })
+
+                showActiveTheme(getPreferredTheme())
+
+                document.querySelectorAll('[data-bs-theme-value]')
+                    .forEach(toggle => {
+                        toggle.addEventListener('click', () => {
+                            const theme = toggle.getAttribute('data-bs-theme-value')
+                            localStorage.setItem('theme', theme)
+                            setTheme(theme)
+                            showActiveTheme(theme)
+                        })
+                    })
+
+            }
+        })
+
+    </script>
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="/static/images/favicon.ico">
+
+    <!-- Plugins CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/vendor/font-awesome/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/vendor/bootstrap-icons/bootstrap-icons.css">
+
+    <!-- Theme CSS -->
+    <link id="style-switch" rel="stylesheet" type="text/css" href="/static/css/style-rtl.css">
+
+{% endblock %}
+{% block content %}
+
+    <main>
+
+        <!-- =======================
+        Inner intro START -->
+        <section class="pt-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="bg-primary bg-opacity-10 p-4 p-md-5 rounded-3 text-center">
+                            <h1 class="text-primary"> اخبار و مقالات {{head.title }}</h1>
+                            <nav class="d-flex justify-content-center" aria-label="breadcrumb">
+                                <ol class="breadcrumb breadcrumb-dots m-0">
+                                    <li class="breadcrumb-item"><a href="{% url 'index_page' %}"><i
+                                            class="bi bi-house me-1"></i> خانه</a></li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        Inner intro END -->
+
+        <!-- =======================
+        Main content START -->
+        <section class="position-relative pt-0">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                    <div id="tech-ajax">
+                        {% for article in article_lists %}
+                            <div class="article_number card border rounded-3 up-hover p-4 mb-4">
+                                <div class="row g-3">
+                                    <div class="col-lg-5">
+                                        <!-- Categories -->
+                                        <a href="#" class="badge text-bg-danger mb-2"><i
+                                                class="fas fa-circle me-2 small fw-bold"></i>تکنولوژی</a>
+                                        <!-- Title -->
+                                        <h4 class="card-title">
+                                            <a href="{{ article.get_absolute_url_article }}"
+                                               class="btn-link text-reset stretched-link">{{ article.title }}</a>
+                                        </h4>
+                                        <!-- Author info -->
+                                        <div class="d-flex align-items-center position-relative mt-3">
+                                            <div class="avatar me-2">
+                                                <img class="avatar-img rounded-circle"
+                                                     src="/static/images/logo-icon.svg" alt="avatar">
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-1"><a href="#" class="stretched-link text-reset btn-link">بلاگینز</a>
+                                                </h5>
+                                                <ul class="nav align-items-center small">
+                                                    <li class="nav-item me-3">{{ article.get_jalali_create_date }}</li>
+                                                    <li class="nav-item"><i
+                                                            class="far fa-clock me-1"></i>{{ article.time_to_read }}
+                                                        دقیقه زمان مطالعه
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- Detail -->
+                                    <div class="col-md-6 col-lg-4">
+                                        <p>{{ article.short_description }}</p>
+                                    </div>
+                                    <!-- Image -->
+                                    <div class="col-md-6 col-lg-3">
+                                        <img class="rounded-3" src="{{ article.image.url }}" alt="Card image">
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ total_articles|json_script:'json-total' }}
+                        <div id="spinner" class="like-btn">
+                            <button class="btn btn-primary d-md-block btn-load-more" type="button">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                ...Loading
+                            </button>
+                        </div>
+                        <div id="load-btn" class="">
+                        <button  onclick="loadMoreTechArticle('{{ category }}')" type="button" class="btn btn-primary-soft w-100">مقالات بیشتر <i
+                                class="bi bi-arrow-down-circle ms-2 align-middle"></i></button>
+                        </div>
+                        <div id="alert" class="alert alert-warning mt-2 like-btn " role="alert">
+                            مقاله و یا خبر دیگری برای بارگزاری وجود ندارد
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- =======================
+        Main content END -->
+
+    </main>
+
+
+{% endblock %}
+
+{% block footer_refrences %}
+    <script src="/static/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/functions.js"></script>
+{% endblock %}

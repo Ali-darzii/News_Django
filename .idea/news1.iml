@@ -27,6 +27,7 @@
         <option value="$MODULE_DIR$/home/templates" />
         <option value="$MODULE_DIR$/user_account/templates" />
         <option value="$MODULE_DIR$/user_panel/templates" />
+        <option value="$MODULE_DIR$/articles/templates" />
       </list>
     </option>
   </component>

@@ -1,0 +1,94 @@
+<div class="card-header border-bottom p-3">
+    <h4 class="card-header-title mb-0">حساب کاربری</h4>
+</div>
+<div class="card-body">
+    <!-- Full name -->
+    <div class="mb-3">
+        <label class="form-label">نام کامل</label>
+        <div class="input-group">
+            {{ origin_form.first_name }}{{ origin_form.last_name }}
+
+        </div>
+        <div class="text-danger-emphasis">{{ origin_form.first_name.errors }}</div>
+        <div class="text-danger-emphasis">{{ origin_form.last_name.errors }}</div>
+    </div>
+    <!-- Username -->
+    <div class="mb-3">
+        <label class="form-label">ایمیل</label>
+        <div class="input-group">
+            {{ origin_form.email }}
+
+        </div>
+        <div class="text-danger-emphasis">{{ origin_form.email.errors }}</div>
+    </div>
+    <!-- Profile picture -->
+    <div class="mb-3">
+        <label class="form-label">تصویر پروفایل</label>
+        <!-- Avatar upload START -->
+        <div class="d-flex align-items-center">
+
+                <div class="position-relative me-3">
+                    <!-- Avatar edit -->
+                    <div class="position-absolute top-0 end-0  z-index-9">
+                        <a id="uploadButton"
+                           class="btn btn-sm btn-light btn-round mb-0 mt-n1 me-n1"
+                           href=""> <i class="bi bi-pencil"></i> </a>
+                        {{ origin_form.avatar }}
+                    </div>
+                    <!-- Avatar preview -->
+                    <div id="form_avatar" class="avatar avatar-xl">
+                        {% if user.avatar  %}
+                            <img class="avatar-img rounded-circle border border-white border-3 shadow"
+                             src="{{ user.avatar.url }}" alt="">
+                        {% else %}
+                            <img class="avatar-img rounded-circle border border-white border-3 shadow"
+                             src="/static/images/avatar/Defult_Profile.jpg" alt="">
+                        {% endif %}
+
+                    </div>
+                </div>
+
+
+            <!-- Avatar remove button -->
+            <div class="avatar-remove">
+                {% if user.avatar %}
+                    <button onclick="deleteAvatar()" name="delete_avatar" type="button"
+                            class="placement-btn-1 btn btn-danger btn-sm ">حذف عکس پروفایل
+                {% endif %}
+
+                </button>
+                <p id="imageName"></p>
+                <a id="deleteButton" href="#">حذف تصویر انتخاب شده</a>
+            </div>
+        </div>
+        <!-- Avatar upload END -->
+    </div>
+    <!-- Job title -->
+
+    <!-- Location -->
+    <div class="mb-3">
+        <label class="form-label">شهر سکونت</label>
+        {{ origin_form.city }}
+        <div class="text-danger-emphasis">{{ origin_form.city.errors }}</div>
+    </div>
+    <!-- Bio -->
+    <div class="mb-3">
+        <label class="form-label">توضیحات</label>
+        {{ origin_form.about_user }}
+        <div class="form-text">توضیحات مختصری برای پروفایل شما</div>
+    </div>
+    <!-- Birthday -->
+    <div>
+        <label class="form-label">تاریخ تولد</label>
+        {{ origin_form.birth }}
+    </div>
+    <!-- Save button -->
+
+
+    <div class="d-flex justify-content-end mt-4">
+        <button {% comment %}onclick="userAccountOriginFrom()"{% endcomment %}
+                id="save_user_edit" name="save_user_edit"
+                type="submit" class="btn btn-primary">ذخیره
+        </button>
+    </div>
+</div>

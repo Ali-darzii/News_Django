@@ -5,7 +5,7 @@ import sweetify
 # Create your views here.
 from django.views.generic.base import View
 from .fomrs import ContactUsForm
-from .models import ContactUs
+from .models import ContactUs, ContactUsInfo
 
 
 class ContactUsView(View):
@@ -19,9 +19,10 @@ class ContactUsView(View):
                                 persistent=True
                                 )
             del request.session['user_not_found']
-
+        contact_info: ContactUsInfo = ContactUsInfo.objects.filter(is_active=True).first()
         context = {
-            'form': ContactUsForm
+            'form': ContactUsForm,
+            'contact_info': contact_info
         }
         return render(request, 'contact_us/contact_us_page.html', context)
 
@@ -44,3 +45,4 @@ class ContactUsView(View):
             'form': contact_form
         }
         return render(request, 'contact_us/contact_us_page.html', context)
+

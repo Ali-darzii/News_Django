@@ -1,0 +1,54 @@
+{% load poll_extras %}
+
+<!-- Offcanvas header -->
+<div class="offcanvas-header justify-content-between border-bottom px-3">
+    <h3 class="mb-0">سبد خرید</h3>
+    <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+</div>
+
+<!-- Offcanvas body -->
+
+<div class="offcanvas-body d-flex flex-column px-3">
+    {% if order.orderdetail_set.all %}
+        {% for detail in order.orderdetail_set.all %}
+            <div class="row g-3 {% if not forloop.first%}header-basket{% endif %}">
+                <!-- Image -->
+                <div class="col-3">
+                    <img class="rounded-2 bg-light p-2" src="{{ detail.product.image.url }}" alt="avatar">
+                </div>
+
+                <div class="col-6">
+                    <div class="basket-product-title"><h6
+                            class="mb-1 text-basket-product-title">{{ detail.product.title }}</h6></div>
+                    <div class="d-flex justify-content-between">
+                        <h6 class="mb-0 text-success">{{ detail.product.price|three_digits_currency }}</h6>
+                        <a onclick="removeOrderDetail({{ detail.id }})" href="#" class="btn btn-sm btn-link">حذف</a>
+                    </div>
+                </div>
+
+                <div class="col-9 flost-s">
+                    <button onclick="changeOrderDetailCount({{ detail.id }},'increase')"
+                            class="size-btn btn btn-info-soft" id="increase">+
+                    </button>
+                    <span id="number">{{ detail.count }}</span>
+                    <button onclick="changeOrderDetailCount({{ detail.id }},'decrease')"
+                            class="size-btn btn btn-info-soft" id="decrease">-
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-danger">سبد خرید شما خالی است !!</div>
+    {% endif %}
+    <!-- Button and price -->
+    <div class="mt-auto">
+        <div class="d-flex justify-content-between mb-2">
+            <h6 class="mb-0">جمع کل</h6>
+            <h5 class="text-success mb-0">{{ sum|three_digits_currency }}</h5>
+        </div>
+        <!-- Button -->
+        <div class="d-grid">
+            <a href="{% url 'order_basket_view' %}" class="btn btn-lg btn-primary-soft mb-0">رفتن به صفحه سبد خرید</a>
+        </div>
+    </div>
+</div>

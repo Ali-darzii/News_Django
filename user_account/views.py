@@ -115,13 +115,13 @@ class SignInView(View):
             del request.session['new_active']
 
         user_found = request.session.get('user_found_reset')
-        if user_found is not None:
-            sweetify.sweetalert(request, 'عملیات موفق', icon='success',
-                                text='رمز حساب کاربری شما تغییر یافت و می توانید ورود کنید',
-                                button='ok',
-                                persistent=True
-                                )
-            del request.session['user_found_reset']
+        # if user_found is not None:
+        #     sweetify.sweetalert(request, 'عملیات موفق', icon='success',
+        #                         text='رمز حساب کاربری شما تغییر یافت و می توانید ورود کنید',
+        #                         button='ok',
+        #                         persistent=True
+        #                         )
+        #     del request.session['user_found_reset']
 
         panel_change_pass = request.session.get('panel_change_pass')
         if panel_change_pass is not None:
